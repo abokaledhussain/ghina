@@ -3,88 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة المكياج - غنى العرياني</title>
+    <title>لعبة XO</title>
     <style>
         body {
-            text-align: center;
-            background-color: #f0f0f0;
             font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
         }
-        .doll-container {
-            margin: 20px auto;
-            width: 200px;
-            height: 400px;
-            position: relative;
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
         }
-        .doll {
-            width: 100%;
-            height: 100%;
-            background-image: url('doll.png'); /* ضع هنا رابط صورة العروسة */
-            background-size: cover;
-            position: relative;
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: #f0f0f0;
         }
-        .makeup {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
+        #message {
+            margin-top: 20px;
+            font-size: 1.5em;
         }
-        .button-container {
+        #controls {
             margin-top: 20px;
         }
         button {
-            padding: 10px 20px;
             margin: 5px;
-            font-size: 16px;
+            padding: 10px;
+            font-size: 1em;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>لعبة المكياج - غنى العرياني</h1>
-    <div class="doll-container">
-        <div class="doll" id="doll">
-            <div class="makeup" id="makeup"></div>
-        </div>
-    </div>
-    <div class="button-container">
-        <button onclick="applyMakeup('lipstick')">أحمر الشفاه</button>
-        <button onclick="applyMakeup('blush')">بلشر</button>
-        <button onclick="applyMakeup('eyeshadow')">آيشادو</button>
-        <button onclick="applyMakeup('mascara')">مسكرة</button>
-        <button onclick="changeColor()">تغيير اللون</button>
+    <div id="game-board"></div>
+    <div id="message"></div>
+    <div id="controls">
+        <button onclick="resetGame()">إعادة البدء</button>
+        <button onclick="changeTheme()">تغيير المظهر</button>
     </div>
 
     <script>
-        function applyMakeup(type) {
-            const makeup = document.getElementById('makeup');
-            switch(type) {
-                case 'lipstick':
-                    makeup.style.backgroundImage = 'url(lipstick.png)'; // صورة تأثير أحمر الشفاه
-                    break;
-                case 'blush':
-                    makeup.style.backgroundImage = 'url(blush.png)'; // صورة تأثير البلشر
-                    break;
-                case 'eyeshadow':
-                    makeup.style.backgroundImage = 'url(eyeshadow.png)'; // صورة تأثير الآيشادو
-                    break;
-                case 'mascara':
-                    makeup.style.backgroundImage = 'url(mascara.png)'; // صورة تأثير المسكرة
-                    break;
-                default:
-                    break;
+        const board = document.getElementById('game-board');
+        const message = document.getElementById('message');
+        const colors = ['#FFFAF0', '#F0FFF0', '#F0F8FF', '#FFF0F5', '#E6E6FA', '#FFFACD', '#F5FFFA', '#F0FFFF', '#F5F5DC', '#FAFAD2', '#E0FFFF', '#FAEBD7', '#FFFFE0'];
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let themeIndex = 0;
+
+        function createBoard() {
+            board.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', makeMove);
+                board.appendChild(cell);
             }
-            makeup.style.backgroundSize = 'cover';
-            makeup.style.backgroundRepeat = 'no-repeat';
         }
 
-        function changeColor() {
-            const colors = ['pink', 'red', 'purple', 'black', 'blue'];
-            const doll = document.getElementById('doll');
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            doll.style.backgroundColor = randomColor;
+        function makeMove(event) {
+            const index = event.target.dataset.index;
+            if (gameBoard[index] === '') {
+                gameBoard[index] = currentPlayer;
+                event.target.textContent = currentPlayer;
+                if (checkWin(currentPlayer)) {
+                    message.textContent = currentPlayer === 'X' ? 'فاز اللاعب "غنى العرياني"' : 'فاز اللاعب "الجهاز"';
+                } else if (gameBoard.every(cell => cell !== '')) {
+                    message.textContent = 'تعادل';
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                }
+            }
         }
+
+        function checkWin(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                [0, 4, 8], [2, 4, 6]             // Diagonals
+            ];
+            return winPatterns.some(pattern => {
+                return pattern.every(index => gameBoard[index] === player);
+            });
+        }
+
+        function resetGame() {
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            message.textContent = '';
+            createBoard();
+        }
+
+        function changeTheme() {
+            themeIndex = (themeIndex + 1) % colors.length;
+            document.body.style.backgroundColor = colors[themeIndex];
+        }
+
+        createBoard();
     </script>
 </body>
 </html>
