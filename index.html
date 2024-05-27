@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة XO</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background-color: #f0f0f0;
+            transition: background-color 0.5s, color 0.5s;
+            margin: 0;
+        }
+        #game {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            background-color: #fff;
+            border: 1px solid #000;
+            cursor: pointer;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 1.5rem;
+        }
+        #reset, #changeTheme {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        #footer {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-family: 'Scheherazade New', serif;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <div id="game">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <div id="message"></div>
+    <button id="reset">إعادة اللعب</button>
+    <button id="changeTheme">تغيير المظهر</button>
+</div>
+
+<div id="footer">برمجة غنى العرياني</div>
+
+<script>
+    const cells = document.querySelectorAll('.cell');
+    const messageElement = document.getElementById('message');
+    const resetButton = document.getElementById('reset');
+    const changeThemeButton = document.getElementById('changeTheme');
+    let currentPlayer = 'X';
+    let gameActive = true;
+    const board = ['', '', '', '', '', '', '', '', ''];
+
+    const winningConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
+
+    const themes = [
+        {background: '#f0f0f0', color: '#000', cellBg: '#fff', buttonBg: '#e0e0e0'},
+        {background: '#fffbf2', color: '#3e2723', cellBg: '#ffecb3', buttonBg: '#ffe0b2'},
+        {background: '#e8f5e9', color: '#1b5e20', cellBg: '#c8e6c9', buttonBg: '#a5d6a7'},
+        {background: '#e3f2fd', color: '#0d47a1', cellBg: '#bbdefb', buttonBg: '#90caf9'},
+        {background: '#fce4ec', color: '#880e4f', cellBg: '#f8bbd0', buttonBg: '#f48fb1'},
+        {background: '#fffde7', color: '#f57f17', cellBg: '#fff9c4', buttonBg: '#fff59d'},
+        {background: '#f3e5f5', color: '#4a148c', cellBg: '#e1bee7', buttonBg: '#ce93d8'},
+        {background: '#f1f8e9', color: '#33691e', cellBg: '#dcedc8', buttonBg: '#c5e1a5'},
+        {background: '#e0f2f1', color: '#004d40', cellBg: '#b2dfdb', buttonBg: '#80cbc4'},
+        {background: '#f9fbe7', color: '#827717', cellBg: '#f0f4c3', buttonBg: '#e6ee9c'},
+        {background: '#fce4ec', color: '#880e4f', cellBg: '#f8bbd0', buttonBg: '#f48fb1'},
+        {background: '#ede7f6', color: '#311b92', cellBg: '#d1c4e9', buttonBg: '#b39ddb'},
+        {background: '#fff3e0', color: '#e65100', cellBg: '#ffe0b2', buttonBg: '#ffcc80'},
+    ];
+    let currentThemeIndex = 0;
+
+    function handleCellClick(event) {
+        const cell = event.target;
+        const index = cell.getAttribute('data-index');
+
+        if (board[index] !== '' || !gameActive) {
+            return;
+        }
+
+        board[index] = currentPlayer;
+        cell.textContent = currentPlayer;
+        checkResult();
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    function checkResult() {
+        let roundWon = false;
+        for (let i = 0; i < winningConditions.length; i++) {
+            const winCondition = winningConditions[i];
+            let a = board[winCondition[0]];
+            let b = board[winCondition[1]];
+            let c = board[winCondition[2]];
+
+            if (a === '' || b === '' || c === '') {
+                continue;
+            }
+            if (a === b && b === c) {
+                roundWon = true;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            gameActive = false;
+            messageElement.textContent = currentPlayer === 'X' ? 'فاز اللاعب غنى' : 'فاز اللاعب حسين';
+            return;
+        }
+
+        if (!board.includes('')) {
+            gameActive = false;
+            messageElement.textContent = 'تعادل';
+        }
+    }
+
+    function resetGame() {
+        currentPlayer = 'X';
+        gameActive = true;
+        board.fill('');
+        cells.forEach(cell => {
+            cell.textContent = '';
+        });
+        messageElement.textContent = '';
+    }
+
+    function changeTheme() {
+        currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+        const theme = themes[currentThemeIndex];
+        document.body.style.backgroundColor = theme.background;
+        document.body.style.color = theme.color;
+        cells.forEach(cell => {
+            cell.style.backgroundColor = theme.cellBg;
+            cell.style.color = theme.color;
+        });
+        resetButton.style.backgroundColor = theme.buttonBg;
+        changeThemeButton.style.backgroundColor = theme.buttonBg;
+    }
+
+    cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+    resetButton.addEventListener('click', resetGame);
+    changeThemeButton.addEventListener('click', changeTheme);
+</script>
+
+</body>
+</html>
