@@ -92,18 +92,22 @@
                 try {
                     // استدعاء API للحصول على مواقيت الصلاة
                     const prayerTimesResponse = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2&key=b345048ac0697d437dc9bfeee18ffc70`);
+                    if (!prayerTimesResponse.ok) {
+                        throw new Error(`خطأ في جلب مواقيت الصلاة: ${prayerTimesResponse.status} ${prayerTimesResponse.statusText}`);
+                    }
                     const prayerTimesData = await prayerTimesResponse.json();
-
                     if (prayerTimesData.code !== 200) {
-                        throw new Error('خطأ في جلب مواقيت الصلاة');
+                        throw new Error(`خطأ في جلب مواقيت الصلاة: ${prayerTimesData.data}`);
                     }
 
                     // استدعاء API للحصول على الطقس
                     const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=5af6a461e8c872eada5e97b1&units=metric`);
+                    if (!weatherResponse.ok) {
+                        throw new Error(`خطأ في جلب بيانات الطقس: ${weatherResponse.status} ${weatherResponse.statusText}`);
+                    }
                     const weatherData = await weatherResponse.json();
-
                     if (weatherData.cod !== 200) {
-                        throw new Error('خطأ في جلب بيانات الطقس');
+                        throw new Error(`خطأ في جلب بيانات الطقس: ${weatherData.message}`);
                     }
 
                     // عرض النتائج
@@ -126,7 +130,7 @@
                         </ul>
                     `;
                 } catch (error) {
-                    document.getElementById('result').textContent = 'حدث خطأ أثناء جلب البيانات. يرجى المحاولة مرة أخرى.';
+                    document.getElementById('result').textContent = `حدث خطأ أثناء جلب البيانات. يرجى المحاولة مرة أخرى. التفاصيل: ${error.message}`;
                     console.error(error);
                 }
             } else {
