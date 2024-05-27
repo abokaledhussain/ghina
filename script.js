@@ -1,53 +1,57 @@
-const apiKey = '7bfaaedfce8bf015290fa77bf77aec8f';
-const colors = ['pink', 'lightblue', 'lightgreen', 'lightyellow', 'lightgray'];
-let colorIndex = 0;
-
-function fetchData() {
+function getPrayerTimesAndWeather() {
     const city = document.getElementById('cityInput').value;
-    if (city) {
-        getPrayerTimes(city);
-        getWeather(city);
-    }
-}
+    const prayerApiUrl = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2&language=ar`;
+    const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=7bfaaedfce8bf015290fa77bf77aec8f&units=metric&lang=ar`;
 
-function getPrayerTimes(city) {
-    const prayerTimesApiUrl = `http://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2`;
-
-    fetch(prayerTimesApiUrl)
+    // جلب مواقيت الصلاة
+    fetch(prayerApiUrl)
         .then(response => response.json())
         .then(data => {
-            const timings = data.data.timings;
-            document.getElementById('cityName').innerText = city;
-            document.getElementById('prayerTimes').innerHTML = `
-                <h3>مواقيت الصلاة</h3>
-                <p>الفجر: ${timings.Fajr}</p>
-                <p>الظهر: ${timings.Dhuhr}</p>
-                <p>العصر: ${timings.Asr}</p>
-                <p>المغرب: ${timings.Maghrib}</p>
-                <p>العشاء: ${timings.Isha}</p>
-            `;
+            if (data.code === 200) {
+                const timings = data.data.timings;
+                const tableBody = document.querySelector('#prayerTimesTable tbody');
+                tableBody.innerHTML = `
+                    <tr><td>الفجر</td><td>${convertTo12Hour(timings.Fajr)}</td></tr>
+                    <tr><td>الشروق</td><td>${convertTo12Hour(timings.Sunrise)}</td></tr>
+                    <tr><td>الظهر</td><td>${convertTo12Hour(timings.Dhuhr)}</td></tr>
+                    <tr><td>العصر</td><td>${convertTo12Hour(timings.Asr)}</td></tr>
+                    <tr><td>المغرب</td><td>${convertTo12Hour(timings.Maghrib)}</td></tr>
+                    <tr><td>العشاء</td><td>${convertTo12Hour(timings.Isha)}</td></tr>
+                `;
+            } else {
+                alert('خطأ في جلب مواقيت الصلاة. يرجى المحاولة مرة أخرى.');
+            }
         })
-        .catch(error => console.error('Error fetching prayer times:', error));
-}
+        .catch(error => {
+            console.error('Error fetching prayer times:', error);
+            alert('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+        });
 
-function getWeather(city) {
-    const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=ar`;
-
+    // جلب الطقس
     fetch(weatherApiUrl)
         .then(response => response.json())
         .then(data => {
-            const weather = data.weather[0].description;
-            const temp = data.main.temp;
-            document.getElementById('weather').innerHTML = `
-                <h3>الطقس</h3>
-                <p>الحالة: ${weather}</p>
-                <p>درجة الحرارة: ${temp}°C</p>
-            `;
+            if (data.cod === 200) {
+                const weatherDiv = document.getElementById('weather');
+                weatherDiv.innerHTML = `
+                    <p>الطقس في ${data.name}: ${data.weather[0].description}</p>
+                    <p>درجة الحرارة: ${data.main.temp}°C</p>
+                    <p>الرطوبة: ${data.main.humidity}%</p>
+                `;
+            } else {
+                alert('خطأ في جلب الطقس. يرجى المحاولة مرة أخرى.');
+            }
         })
-        .catch(error => console.error('Error fetching weather:', error));
+        .catch(error => {
+            console.error('Error fetching weather:', error);
+            alert('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+        });
 }
 
-function changeBackground() {
-    colorIndex = (colorIndex + 1) % colors.length;
-    document.body.style.backgroundColor = colors[colorIndex];
+// تحويل الوقت من 24 ساعة إلى 12 ساعة
+function convertTo12Hour(time) {
+    const [hours, minutes] = time.split(':');
+    const period = +hours >= 12 ? 'م' : 'ص';
+    const adjustedHours = +hours % 12 || 12;
+    return `${adjustedHours}:${minutes} ${period}`;
 }
