@@ -31,10 +31,25 @@
         .prayer-times {
             margin-top: 20px;
         }
+        .input-container {
+            margin: 20px;
+        }
+        .input-container input {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>تطبيق مواقيت الصلاة</h1>
+
+    <div class="input-container">
+        <input type="text" id="cityName" placeholder="أدخل اسم المدينة">
+        <button class="button" onclick="getPrayerTimes()">البحث</button>
+    </div>
+
+    <button class="button" onclick="changeColor()">تغيير اللون</button>
 
     <div class="prayer-times">
         <h2>مواقيت الصلاة لمدينتك</h2>
@@ -46,27 +61,34 @@
     </div>
 
     <script>
-        // يمكن إضافة كود جافا سكريبت هنا لتحديد الموقع وعرض مواقيت الصلاة الفعلية
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else {
-                alert("الموقع الجغرافي غير مدعوم في هذا المتصفح.");
+        const colors = [
+            '#ffccff', '#ccffcc', '#ccffff', '#ffcccc', '#ccccff',
+            '#ffffcc', '#ffebcc', '#e6ccff', '#ffcc99', '#ff99cc',
+            '#99ccff', '#ff9966', '#ccff99'
+        ];
+
+        let currentColorIndex = 0;
+
+        function changeColor() {
+            currentColorIndex = (currentColorIndex + 1) % colors.length;
+            document.body.style.backgroundColor = colors[currentColorIndex];
+        }
+
+        function getPrayerTimes() {
+            const cityName = document.getElementById('cityName').value;
+            if (!cityName) {
+                alert('يرجى إدخال اسم المدينة');
+                return;
             }
+            // هنا يمكنك استخدام واجهة برمجة التطبيقات لجلب مواقيت الصلاة بناءً على اسم المدينة
+            // مثال بسيط لتحديث مواقيت الصلاة (يمكنك استبداله ببيانات حقيقية)
+            alert(`جلب مواقيت الصلاة لمدينة: ${cityName}`);
+            document.getElementById("fajr").innerText = "04:30";
+            document.getElementById("dhuhr").innerText = "12:15";
+            document.getElementById("asr").innerText = "15:45";
+            document.getElementById("maghrib").innerText = "18:30";
+            document.getElementById("isha").innerText = "20:00";
         }
-
-        function showPosition(position) {
-            // هنا يمكنك استخدام واجهة برمجة التطبيقات للحصول على مواقيت الصلاة بناءً على الموقع
-            alert("خط العرض: " + position.coords.latitude + "\nخط الطول: " + position.coords.longitude);
-            // قم باستدعاء دالة لجلب مواقيت الصلاة وتحديث العناصر
-        }
-
-        // مثال بسيط لتحديث مواقيت الصلاة (يمكنك استبداله ببيانات حقيقية)
-        document.getElementById("fajr").innerText = "04:30";
-        document.getElementById("dhuhr").innerText = "12:15";
-        document.getElementById("asr").innerText = "15:45";
-        document.getElementById("maghrib").innerText = "18:30";
-        document.getElementById("isha").innerText = "20:00";
     </script>
 </body>
 </html>
