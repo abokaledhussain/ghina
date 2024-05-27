@@ -8,16 +8,32 @@
 </head>
 <body>
     <div class="container">
-        <h1>مواقيت الصلاة والطقس</h1>
-        <input type="text" id="cityInput" placeholder="أدخل اسم المدينة">
-        <button onclick="fetchData()">بحث</button>
-        <div id="results">
-            <h2 id="cityName"></h2>
-            <div id="prayerTimes"></div>
-            <div id="weather"></div>
+        <div class="header">
+            <img src="hussain.png" alt="الشعار" class="logo">
+            <h1>مواقيت الصلاة</h1>
         </div>
-        <button onclick="changeBackground()">تغيير لون الخلفية</button>
+        <input type="text" id="cityInput" placeholder="أدخل اسم المدينة">
+        <button onclick="getPrayerTimesAndWeather()">احصل على مواقيت الصلاة والطقس</button>
+        
+        <div id="weather">
+            <!-- سيتم ملء بيانات الطقس هنا -->
+        </div>
+        
+        <table id="prayerTimesTable">
+            <thead>
+                <tr>
+                    <th>الصلاة</th>
+                    <th>الوقت</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- سيتم ملء هذه البيانات بواسطة JavaScript -->
+            </tbody>
+        </table>
     </div>
-    <script src="scripts.js"></script>
+    <footer>
+        <p>برمجة حسين العرياني</p>
+    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
