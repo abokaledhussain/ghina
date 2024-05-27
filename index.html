@@ -91,7 +91,7 @@
             if (city) {
                 try {
                     // استدعاء API للحصول على مواقيت الصلاة
-                    const prayerTimesResponse = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2&key=b345048ac0697d437dc9bfeee18ffc70`);
+                    const prayerTimesResponse = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2&key=cbc51ce6b403bc63ab3729807141973a`);
                     if (!prayerTimesResponse.ok) {
                         throw new Error(`خطأ في جلب مواقيت الصلاة: ${prayerTimesResponse.status} ${prayerTimesResponse.statusText}`);
                     }
