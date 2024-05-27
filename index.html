@@ -36,11 +36,6 @@
 <body>
     <h1>تطبيق مواقيت الصلاة</h1>
 
-    <div class="controls">
-        <button class="button" onclick="getLocation()">تحديد الموقع</button>
-        <button class="button" onclick="changeSound()">تغيير الصوت</button>
-    </div>
-
     <div class="prayer-times">
         <h2>مواقيت الصلاة لمدينتك</h2>
         <p>الفجر: <span id="fajr">--:--</span></p>
@@ -51,6 +46,7 @@
     </div>
 
     <script>
+        // يمكن إضافة كود جافا سكريبت هنا لتحديد الموقع وعرض مواقيت الصلاة الفعلية
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition);
@@ -63,11 +59,6 @@
             // هنا يمكنك استخدام واجهة برمجة التطبيقات للحصول على مواقيت الصلاة بناءً على الموقع
             alert("خط العرض: " + position.coords.latitude + "\nخط الطول: " + position.coords.longitude);
             // قم باستدعاء دالة لجلب مواقيت الصلاة وتحديث العناصر
-        }
-
-        function changeSound() {
-            alert("تغيير الصوت مفعّل.");
-            // هنا يمكنك إضافة منطق لتغيير الصوت
         }
 
         // مثال بسيط لتحديث مواقيت الصلاة (يمكنك استبداله ببيانات حقيقية)
