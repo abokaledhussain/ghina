@@ -11,8 +11,7 @@ function fetchData() {
 }
 
 function getPrayerTimes(city) {
-    // استبدل هذا بعنوان API الحقيقي لمواقيت الصلاة
-    const prayerTimesApiUrl = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2`;
+    const prayerTimesApiUrl = `http://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2`;
 
     fetch(prayerTimesApiUrl)
         .then(response => response.json())
