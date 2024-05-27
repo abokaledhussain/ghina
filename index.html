@@ -1,119 +1,67 @@
-<!DOCTYPE html>
-<html lang="ar">
+   <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق مواقيت الصلاة</title>
+    <title>مشروع مواقيت الصلاة والقبلة والطقس</title>
     <style>
         body {
-            background-color: #ffccff;
             font-family: Arial, sans-serif;
-            text-align: center;
+            background-color: #fce4ec; /* لون وردي فاتح */
+            color: #333; /* لون أسود */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #ff66b2;
-        }
-        .button {
-            background-color: #ff66b2;
-            border: none;
-            color: white;
-            padding: 10px 20px;
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
+            color: #333; /* لون أسود */
+        }
+        #search-btn, #theme-btn {
+            background-color: #ffb6c1; /* لون وردي غامق */
+            color: #fff; /* لون أبيض */
+            border: none;
+            padding: 10px 20px;
             font-size: 16px;
-            margin: 10px 2px;
+            border-radius: 5px;
             cursor: pointer;
+            margin-bottom: 10px;
         }
-        .button:hover {
-            background-color: #ff3399;
+        #search-btn:hover, #theme-btn:hover {
+            background-color: #ff69b4; /* لون وردي فاتح */
         }
-        .prayer-times {
+        #result {
             margin-top: 20px;
+            text-align: center;
         }
-        .input-container {
-            margin: 20px;
-        }
-        .input-container input {
-            padding: 10px;
-            font-size: 16px;
-            margin-right: 10px;
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333; /* لون أسود */
+            color: #fff; /* لون أبيض */
+            text-align: center;
+            padding: 10px 0;
         }
     </style>
 </head>
 <body>
-    <h1>تطبيق مواقيت الصلاة</h1>
-
-    <div class="input-container">
-        <input type="text" id="cityName" placeholder="أدخل اسم المدينة">
-        <button class="button" onclick="getPrayerTimes()">البحث</button>
+    <div class="container">
+        <h1>مشروع مواقيت الصلاة والقبلة والطقس</h1>
+        <button id="search-btn">ابحث عن المدينة</button>
+        <button id="theme-btn">تغيير المظهر</button>
+        <div id="result"></div>
     </div>
-
-    <button class="button" onclick="changeColor()">تغيير اللون</button>
-
-    <div class="prayer-times">
-        <h2 id="cityNameHeader">مواقيت الصلاة</h2>
-        <p>الفجر: <span id="fajr">--:--</span></p>
-        <p>الظهر: <span id="dhuhr">--:--</span></p>
-        <p>العصر: <span id="asr">--:--</span></p>
-        <p>المغرب: <span id="maghrib">--:--</span></p>
-        <p>العشاء: <span id="isha">--:--</span></p>
-    </div>
-
+    <div class="footer">غنى العرياني</div>
     <script>
-        const colors = [
-            '#ffccff', '#ccffcc', '#ccffff', '#ffcccc', '#ccccff',
-            '#ffffcc', '#ffebcc', '#e6ccff', '#ffcc99', '#ff99cc',
-            '#99ccff', '#ff9966', '#ccff99'
-        ];
-
-        let currentColorIndex = 0;
-
-        function changeColor() {
-            currentColorIndex = (currentColorIndex + 1) % colors.length;
-            document.body.style.backgroundColor = colors[currentColorIndex];
-        }
-
-        async function getPrayerTimes() {
-            const cityName = document.getElementById('cityName').value;
-            if (!cityName) {
-                alert('يرجى إدخال اسم المدينة');
-                return;
-            }
-
-            // قائمة مفاتيح API التي سيتم استخدامها بالتتابع
-            const apiKeys = [
-                'b345048ac0697d437dc9bfeee18ffc70',
-                'cbc51ce6b403bc63ab3729807141973a'
-            ];
-            let data;
-            
-            // محاولة استخدام كل مفتاح API بالتتابع حتى يتم العثور على واحد يعمل
-            for (const apiKey of apiKeys) {
-                const apiUrl = `https://api.aladhan.com/v1/timingsByCity?city=${cityName}&country=&method=2&key=${apiKey}`;
-
-                try {
-                    const response = await fetch(apiUrl);
-                    data = await response.json();
-                    if (data.code === 200) {
-                        break;  // كسر الحلقة إذا كانت الاستجابة ناجحة
-                    }
-                } catch (error) {
-                    console.error(`Error using API key ${apiKey}:`, error);
-                }
-            }
-
-            if (data && data.code === 200) {
-                document.getElementById("cityNameHeader").innerText = `مواقيت الصلاة في ${cityName}`;
-                document.getElementById("fajr").innerText = data.data.timings.Fajr;
-                document.getElementById("dhuhr").innerText = data.data.timings.Dhuhr;
-                document.getElementById("asr").innerText = data.data.timings.Asr;
-                document.getElementById("maghrib").innerText = data.data.timings.Maghrib;
-                document.getElementById("isha").innerText = data.data.timings.Isha;
-            } else {
-                alert('حدث خطأ في جلب مواقيت الصلاة. يرجى المحاولة مرة أخرى.');
-            }
-        }
+        // يمكنك إضافة السكريبت الخاص بك هنا للتفاعل مع الأزرار وعرض النتائج
     </script>
 </body>
 </html>
