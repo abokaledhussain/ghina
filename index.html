@@ -10,13 +10,25 @@
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
         }
-        .doll {
+        .doll-container {
             margin: 20px auto;
             width: 200px;
             height: 400px;
-            background-image: url('doll.png'); /* صورة العروسة */
+            position: relative;
+        }
+        .doll {
+            width: 100%;
+            height: 100%;
+            background-image: url('doll.png'); /* ضع هنا رابط صورة العروسة */
             background-size: cover;
             position: relative;
+        }
+        .makeup {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
         }
         .button-container {
             margin-top: 20px;
@@ -31,7 +43,11 @@
 </head>
 <body>
     <h1>لعبة المكياج - غنى العرياني</h1>
-    <div class="doll" id="doll"></div>
+    <div class="doll-container">
+        <div class="doll" id="doll">
+            <div class="makeup" id="makeup"></div>
+        </div>
+    </div>
     <div class="button-container">
         <button onclick="applyMakeup('lipstick')">أحمر الشفاه</button>
         <button onclick="applyMakeup('blush')">بلشر</button>
@@ -42,23 +58,25 @@
 
     <script>
         function applyMakeup(type) {
-            const doll = document.getElementById('doll');
+            const makeup = document.getElementById('makeup');
             switch(type) {
                 case 'lipstick':
-                    doll.style.backgroundColor = 'pink'; // تأثير أحمر الشفاه
+                    makeup.style.backgroundImage = 'url(lipstick.png)'; // صورة تأثير أحمر الشفاه
                     break;
                 case 'blush':
-                    doll.style.backgroundColor = 'red'; // تأثير البلشر
+                    makeup.style.backgroundImage = 'url(blush.png)'; // صورة تأثير البلشر
                     break;
                 case 'eyeshadow':
-                    doll.style.backgroundColor = 'purple'; // تأثير الآيشادو
+                    makeup.style.backgroundImage = 'url(eyeshadow.png)'; // صورة تأثير الآيشادو
                     break;
                 case 'mascara':
-                    doll.style.backgroundColor = 'black'; // تأثير المسكرة
+                    makeup.style.backgroundImage = 'url(mascara.png)'; // صورة تأثير المسكرة
                     break;
                 default:
                     break;
             }
+            makeup.style.backgroundSize = 'cover';
+            makeup.style.backgroundRepeat = 'no-repeat';
         }
 
         function changeColor() {
