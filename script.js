@@ -1,27 +1,54 @@
-function addChannel() {
-  var name = document.getElementById("channelName").value;
-  var link = document.getElementById("channelLink").value;
-  var table = document.getElementById("channelTable");
-  var row = table.insertRow(-1);
-  var cell = row.insertCell(0);
-  cell.innerHTML = "<a href='#' onclick='displayChannel(\"" + link + "\")'>" + name + "</a>";
+const apiKey = '7bfaaedfce8bf015290fa77bf77aec8f';
+const colors = ['pink', 'lightblue', 'lightgreen', 'lightyellow', 'lightgray'];
+let colorIndex = 0;
+
+function fetchData() {
+    const city = document.getElementById('cityInput').value;
+    if (city) {
+        getPrayerTimes(city);
+        getWeather(city);
+    }
 }
 
-function displayChannel(link) {
-  document.getElementById("channelFrame").src = link;
+function getPrayerTimes(city) {
+    // استبدل هذا بعنوان API الحقيقي لمواقيت الصلاة
+    const prayerTimesApiUrl = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2`;
+
+    fetch(prayerTimesApiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const timings = data.data.timings;
+            document.getElementById('cityName').innerText = city;
+            document.getElementById('prayerTimes').innerHTML = `
+                <h3>مواقيت الصلاة</h3>
+                <p>الفجر: ${timings.Fajr}</p>
+                <p>الظهر: ${timings.Dhuhr}</p>
+                <p>العصر: ${timings.Asr}</p>
+                <p>المغرب: ${timings.Maghrib}</p>
+                <p>العشاء: ${timings.Isha}</p>
+            `;
+        })
+        .catch(error => console.error('Error fetching prayer times:', error));
 }
 
-function saveData() {
-  // Your code to save data to XML file
-  alert("تم حفظ البيانات بنجاح!");
+function getWeather(city) {
+    const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=ar`;
+
+    fetch(weatherApiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const weather = data.weather[0].description;
+            const temp = data.main.temp;
+            document.getElementById('weather').innerHTML = `
+                <h3>الطقس</h3>
+                <p>الحالة: ${weather}</p>
+                <p>درجة الحرارة: ${temp}°C</p>
+            `;
+        })
+        .catch(error => console.error('Error fetching weather:', error));
 }
 
-function loadData() {
-  // Your code to load data from XML file
-  alert("تم استدعاء البيانات المحفوظة بنجاح!");
-}
-
-function changeTheme() {
-  var body = document.body;
-  body.classList.toggle("dark");
+function changeBackground() {
+    colorIndex = (colorIndex + 1) % colors.length;
+    document.body.style.backgroundColor = colors[colorIndex];
 }
