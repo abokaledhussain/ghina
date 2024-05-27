@@ -102,6 +102,7 @@
             }
 
             // Get Exchange Rates
+            const exchangeRateApiKey = 'YOUR_EXCHANGE_RATE_API_KEY'; // استبدل بمفتاح API الخاص بك
             const exchangeRateUrl = `https://api.exchangerate-api.com/v4/latest/USD`;
             const exchangeRateResponse = await fetch(exchangeRateUrl);
             const exchangeRateData = await exchangeRateResponse.json();
@@ -111,5 +112,4 @@
             }
 
             // Update Prayer Times
-            document.getElementById("cityNameHeader").innerText = `مواقيت الصلاة في ${cityName}`;
-            document.getElementById("fajr").innerText = prayerTimesData.data.timings.Faj
+           
