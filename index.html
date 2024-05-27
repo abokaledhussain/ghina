@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق مواقيت الصلاة والطقس</title>
+    <title>تطبيق مواقيت الصلاة ومعدلات الصرف</title>
     <style>
         body {
             background-color: #ffccff;
@@ -31,7 +31,7 @@
         .prayer-times {
             margin-top: 20px;
         }
-        .weather-info {
+        .exchange-rates {
             margin-top: 20px;
         }
         .input-container {
@@ -45,11 +45,11 @@
     </style>
 </head>
 <body>
-    <h1>تطبيق مواقيت الصلاة والطقس</h1>
+    <h1>تطبيق مواقيت الصلاة ومعدلات الصرف</h1>
 
     <div class="input-container">
         <input type="text" id="cityName" placeholder="أدخل اسم المدينة">
-        <button class="button" onclick="getPrayerTimesAndWeather()">البحث</button>
+        <button class="button" onclick="getPrayerTimesAndExchangeRates()">البحث</button>
     </div>
 
     <button class="button" onclick="changeColor()">تغيير اللون</button>
@@ -63,12 +63,12 @@
         <p>العشاء: <span id="isha">--:--</span></p>
     </div>
 
-    <div class="weather-info">
-        <h2>حالة الطقس</h2>
-        <p>الدرجة الحرارة: <span id="temperature">--</span> &deg;C</p>
-        <p>الطقس: <span id="weatherDescription">--</span></p>
-        <p>رطوبة الهواء: <span id="humidity">--</span>%</p>
-        <p>سرعة الرياح: <span id="windSpeed">--</span> م/ث</p>
+    <div class="exchange-rates">
+        <h2>معدلات الصرف</h2>
+        <p>معدل الصرف للدولار: <span id="usdExchangeRate">--</span></p>
+        <p>معدل الصرف لليورو: <span id="eurExchangeRate">--</span></p>
+        <p>معدل الصرف للجنيه الإسترليني: <span id="gbpExchangeRate">--</span></p>
+        <!-- يمكنك إضافة المزيد من العملات هنا إذا لزم الأمر -->
     </div>
 
     <script>
@@ -85,7 +85,7 @@
             document.body.style.backgroundColor = colors[currentColorIndex];
         }
 
-        async function getPrayerTimesAndWeather() {
+        async function getPrayerTimesAndExchangeRates() {
             const cityName = document.getElementById('cityName').value;
             if (!cityName) {
                 alert('يرجى إدخال اسم المدينة');
@@ -101,30 +101,15 @@
                 return;
             }
 
-            // Get Weather
-            const weatherApiKey = '5af6a461e8c872eada5e97b1';
-            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${weatherApiKey}&units=metric`;
-            const weatherResponse = await fetch(weatherUrl);
-            const weatherData = await weatherResponse.json();
-            if (weatherData.cod !== 200) {
-                alert('حدث خطأ في جلب معلومات الطقس. يرجى المحاولة مرة أخرى.');
+            // Get Exchange Rates
+            const exchangeRateApiKey = 'YOUR_EXCHANGE_RATE_API_KEY'; // استبدل بمفتاح API الخاص بك
+            const exchangeRateUrl = `https://api.exchangerate-api.com/v4/latest/USD`;
+            const exchangeRateResponse = await fetch(exchangeRateUrl);
+            const exchangeRateData = await exchangeRateResponse.json();
+            if (!exchangeRateData || !exchangeRateData.rates) {
+                alert('حدث خطأ في جلب معدلات الصرف. يرجى المحاولة مرة أخرى.');
                 return;
             }
 
             // Update Prayer Times
-            document.getElementById("cityNameHeader").innerText = `مواقيت الصلاة في ${cityName}`;
-            document.getElementById("fajr").innerText = prayerTimesData.data.timings.Fajr;
-            document.getElementById("dhuhr").innerText = prayerTimesData.data.timings.Dhuhr;
-            document.getElementById("asr").innerText = prayerTimesData.data.timings.Asr;
-            document.getElementById("maghrib").innerText = prayerTimesData.data.timings.Maghrib;
-            document.getElementById("isha").innerText = prayerTimesData.data.timings.Isha;
-
-            // Update Weather
-            document.getElementById("temperature").innerText = weatherData.main.temp;
-            document.getElementById("weatherDescription").innerText = weatherData.weather[0].description;
-            document.getElementById("humidity").innerText = weatherData.main.humidity;
-            document.getElementById("windSpeed").innerText = weatherData.wind.speed;
-        }
-    </script>
-</body>
-</html>
+            document.getElementById("city
