@@ -74,20 +74,44 @@
             document.body.style.backgroundColor = colors[currentColorIndex];
         }
 
-        function getPrayerTimes() {
+        async function getPrayerTimes() {
             const cityName = document.getElementById('cityName').value;
             if (!cityName) {
                 alert('يرجى إدخال اسم المدينة');
                 return;
             }
-            // هنا يمكنك استخدام واجهة برمجة التطبيقات لجلب مواقيت الصلاة بناءً على اسم المدينة
-            // مثال بسيط لتحديث مواقيت الصلاة (يمكنك استبداله ببيانات حقيقية)
-            alert(`جلب مواقيت الصلاة لمدينة: ${cityName}`);
-            document.getElementById("fajr").innerText = "04:30";
-            document.getElementById("dhuhr").innerText = "12:15";
-            document.getElementById("asr").innerText = "15:45";
-            document.getElementById("maghrib").innerText = "18:30";
-            document.getElementById("isha").innerText = "20:00";
+
+            // قائمة مفاتيح API التي سيتم استخدامها بالتتابع
+            const apiKeys = [
+                'b345048ac0697d437dc9bfeee18ffc70',
+                'cbc51ce6b403bc63ab3729807141973a'
+            ];
+            let data;
+            
+            // محاولة استخدام كل مفتاح API بالتتابع حتى يتم العثور على واحد يعمل
+            for (const apiKey of apiKeys) {
+                const apiUrl = `https://api.aladhan.com/v1/timingsByCity?city=${cityName}&country=&method=2&key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl);
+                    data = await response.json();
+                    if (data.code === 200) {
+                        break;  // كسر الحلقة إذا كانت الاستجابة ناجحة
+                    }
+                } catch (error) {
+                    console.error(`Error using API key ${apiKey}:`, error);
+                }
+            }
+
+            if (data && data.code === 200) {
+                document.getElementById("fajr").innerText = data.data.timings.Fajr;
+                document.getElementById("dhuhr").innerText = data.data.timings.Dhuhr;
+                document.getElementById("asr").innerText = data.data.timings.Asr;
+                document.getElementById("maghrib").innerText = data.data.timings.Maghrib;
+                document.getElementById("isha").innerText = data.data.timings.Isha;
+            } else {
+                alert('حدث خطأ في جلب مواقيت الصلاة. يرجى المحاولة مرة أخرى.');
+            }
         }
     </script>
 </body>
