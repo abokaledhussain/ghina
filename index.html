@@ -3,140 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مواقيت الصلاة والطقس</title>
+    <title>لعبة XO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #fce4ec; /* لون وردي فاتح */
-            color: #333; /* لون أسود */
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease;
-            direction: rtl;
-            text-align: right;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-image: url('https://www.example.com/path/to/your/background-image.jpg'); /* رابط صورة الورود */
+            background-size: cover;
+            background-position: center;
         }
         h1 {
-            text-align: center;
-            color: #333; /* لون أسود */
-        }
-        #search-btn, #theme-btn {
-            background-color: #ffb6c1; /* لون وردي غامق */
-            color: #fff; /* لون أبيض */
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        #search-btn:hover, #theme-btn:hover {
-            background-color: #ff69b4; /* لون وردي فاتح */
-        }
-        #search-input {
-            width: calc(100% - 22px);
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        #result {
+            font-family: 'Amiri', serif;
+            font-size: 3em;
             margin-top: 20px;
-            text-align: center;
+            color: #333;
         }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #333; /* لون أسود */
-            color: #fff; /* لون أبيض */
-            text-align: center;
-            padding: 10px 0;
-            font-family: 'Traditional Arabic', Arial, sans-serif;
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #333;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 1em;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>مواقيت الصلاة والطقس</h1>
-        <input type="text" id="search-input" placeholder="ادخل اسم المدينة">
-        <button id="search-btn">ابحث عن المدينة</button>
-        <button id="theme-btn">تغيير المظهر</button>
-        <div id="result"></div>
+    <h1>برمجة غنى العرياني</h1>
+    <div id="game-board"></div>
+    <div id="message"></div>
+    <div id="controls">
+        <button onclick="resetGame()">إعادة البدء</button>
+        <button onclick="changeTheme()">تغيير المظهر</button>
     </div>
-    <div class="footer">غنى العرياني</div>
+
     <script>
-        const themes = [
-            '#fce4ec', '#e1f5fe', '#e8f5e9', '#fff3e0', '#f3e5f5',
-            '#f9fbe7', '#ffebee', '#eceff1', '#f3f4f6', '#fffde7',
-            '#f1f8e9', '#fbe9e7', '#e3f2fd'
-        ];
-        let currentThemeIndex = 0;
+        const board = document.getElementById('game-board');
+        const message = document.getElementById('message');
+        const colors = ['#FFFAF0', '#F0FFF0', '#F0F8FF', '#FFF0F5', '#E6E6FA', '#FFFACD', '#F5FFFA', '#F0FFFF', '#F5F5DC', '#FAFAD2', '#E0FFFF', '#FAEBD7', '#FFFFE0'];
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let themeIndex = 0;
 
-        document.getElementById('theme-btn').addEventListener('click', () => {
-            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-            document.body.style.backgroundColor = themes[currentThemeIndex];
-        });
-
-        document.getElementById('search-btn').addEventListener('click', async () => {
-            const city = document.getElementById('search-input').value;
-            if (city) {
-                try {
-                    // استدعاء API للحصول على مواقيت الصلاة
-                    const prayerTimesResponse = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=2&key=cbc51ce6b403bc63ab3729807141973a`);
-                    if (!prayerTimesResponse.ok) {
-                        throw new Error(`خطأ في جلب مواقيت الصلاة: ${prayerTimesResponse.status} ${prayerTimesResponse.statusText}`);
-                    }
-                    const prayerTimesData = await prayerTimesResponse.json();
-                    if (prayerTimesData.code !== 200) {
-                        throw new Error(`خطأ في جلب مواقيت الصلاة: ${prayerTimesData.data}`);
-                    }
-
-                    // استدعاء API للحصول على الطقس
-                    const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=5af6a461e8c872eada5e97b1&units=metric`);
-                    if (!weatherResponse.ok) {
-                        throw new Error(`خطأ في جلب بيانات الطقس: ${weatherResponse.status} ${weatherResponse.statusText}`);
-                    }
-                    const weatherData = await weatherResponse.json();
-                    if (weatherData.cod !== 200) {
-                        throw new Error(`خطأ في جلب بيانات الطقس: ${weatherData.message}`);
-                    }
-
-                    // عرض النتائج
-                    document.getElementById('result').innerHTML = `
-                        <h3>مواقيت الصلاة في ${city}</h3>
-                        <ul>
-                            <li>الفجر: ${prayerTimesData.data.timings.Fajr}</li>
-                            <li>الشروق: ${prayerTimesData.data.timings.Sunrise}</li>
-                            <li>الظهر: ${prayerTimesData.data.timings.Dhuhr}</li>
-                            <li>العصر: ${prayerTimesData.data.timings.Asr}</li>
-                            <li>المغرب: ${prayerTimesData.data.timings.Maghrib}</li>
-                            <li>العشاء: ${prayerTimesData.data.timings.Isha}</li>
-                        </ul>
-                        <h3>الطقس في ${city}</h3>
-                        <ul>
-                            <li>درجة الحرارة: ${weatherData.main.temp}°C</li>
-                            <li>الرطوبة: ${weatherData.main.humidity}%</li>
-                            <li>الرياح: ${weatherData.wind.speed} متر/ثانية</li>
-                            <li>الوصف: ${weatherData.weather[0].description}</li>
-                        </ul>
-                    `;
-                } catch (error) {
-                    document.getElementById('result').textContent = `حدث خطأ أثناء جلب البيانات. يرجى المحاولة مرة أخرى. التفاصيل: ${error.message}`;
-                    console.error(error);
-                }
-            } else {
-                document.getElementById('result').textContent = 'يرجى إدخال اسم المدينة.';
+        function createBoard() {
+            board.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', makeMove);
+                board.appendChild(cell);
             }
-        });
+        }
+
+        function makeMove(event) {
+            const index = event.target.dataset.index;
+            if (gameBoard[index] === '' && currentPlayer === 'X') {
+                gameBoard[index] = currentPlayer;
+                event.target.textContent = currentPlayer;
+                if (checkWin(currentPlayer)) {
+                    message.textContent = 'فاز اللاعب "غنى العرياني"';
+                } else if (gameBoard.every(cell => cell !== '')) {
+                    message.textContent = 'تعادل';
+                } else {
+                    currentPlayer = 'O';
+                    setTimeout(makeAIMove, 500); // تأخير بسيط قبل حركة الذكاء الاصطناعي
+                }
+            }
+        }
+
+        function makeAIMove() {
+            let availableCells = gameBoard.map((cell, index) => cell === '' ? index : null).filter(index => index !== null);
+            if (availableCells.length > 0) {
+                const aiMove = availableCells[Math.floor(Math.random() * availableCells.length)];
+                gameBoard[aiMove] = 'O';
+                document.querySelector(`.cell[data-index="${aiMove}"]`).textContent = 'O';
+                if (checkWin('O')) {
+                    message.textContent = 'فاز اللاعب "الجهاز"';
+                } else if (gameBoard.every(cell => cell !== '')) {
+                    message.textContent = 'تعادل';
+                } else {
+                    currentPlayer = 'X';
+                }
+            }
+        }
+
+        function checkWin(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                [0, 4, 8], [2, 4, 6]             // Diagonals
+            ];
+            return winPatterns.some(pattern => {
+                return pattern.every(index => gameBoard[index] === player);
+            });
+        }
+
+        function resetGame() {
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            message.textContent = '';
+            createBoard();
+        }
+
+        function changeTheme() {
+            themeIndex = (themeIndex + 1) % colors.length;
+            document.body.style.backgroundColor = colors[themeIndex];
+        }
+
+        createBoard();
     </script>
 </body>
 </html>
