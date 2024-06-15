@@ -3,36 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مواقيت الصلاة والطقس</title>
+    <title>خزانة الكتب</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>مواقيت الصلاة</h1>
-        </div>
-        <input type="text" id="cityInput" placeholder="أدخل اسم المدينة">
-        <button onclick="getPrayerTimesAndWeather()">احصل على مواقيت الصلاة والطقس</button>
-        
-        <div id="weather">
-            <!-- سيتم ملء بيانات الطقس هنا -->
-        </div>
-        
-        <table id="prayerTimesTable">
-            <thead>
-                <tr>
-                    <th>الصلاة</th>
-                    <th>الوقت</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- سيتم ملء هذه البيانات بواسطة JavaScript -->
-            </tbody>
-        </table>
+    <h1>خزانة الكتب</h1>
+    <div class="form-container">
+        <input type="text" id="bookName" placeholder="اسم الكتاب">
+        <input type="text" id="author" placeholder="المؤلف">
+        <input type="number" id="parts" placeholder="عدد الأجزاء">
+        <input type="text" id="section" placeholder="القسم">
+        <button id="addBook">➕ إضافة</button>
+        <button id="resetLocalStorage">حذف التخزين المحلي</button>
+        <button id="saveXML">💾 حفظ ملف XML</button>
+        <button id="loadXML">📂 استرجاع ملف XML</button>
     </div>
-    <footer>
-        <p>برمجة حسين العرياني</p>
-    </footer>
-    <script src="script.js"></script>
+    <div class="search-container">
+        <input type="text" id="search" placeholder="🔍 ابحث عن كتاب">
+        <p id="bookCount">عدد الكتب في المكتبة: 0</p>
+    </div>
+    <div id="bookList" class="book-list">
+        <!-- سيتم إضافة المذكرات هنا ديناميكياً -->
+    </div>
+</div>
+    <script src="scripts.js"></script>
 </body>
 </html>
