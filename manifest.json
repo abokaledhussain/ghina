@@ -1,0 +1,9 @@
+{
+  "name": "مترجم صوتي إنجليزي → كتابة عربية",
+  "short_name": "مترجم صوتي",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f7fb",
+  "theme_color": "#0078d7",
+  "orientation": "portrait"
+}
