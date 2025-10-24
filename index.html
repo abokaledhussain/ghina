@@ -1,287 +1,189 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المصروفات الشهرية</title>
-    <style>
-        body {
-            direction: rtl;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        input {
-            width: 93%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            display: block;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-        .delete-btn {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            width: 90%;
-        }
-        .reset-btn, .print-btn {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            width: 48%;
-        }
-        .reset-btn {
-            background-color: #4CAF50;
-        }
-        .print-btn {
-            background-color: #008CBA;
-        }
-        header {
-            background-color: #5c67f2;
-            color: #fff;
-            padding: 15px 0;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        header .date {
-            margin-top: 10px;
-            color: #FFD700;
-            font-size: 18px;
-        }
-        header input {
-            width: 80%;
-            padding: 12px;
-            border: none;
-            border-radius: 25px;
-            margin-top: 15px;
-            font-size: 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مترجم صوتي إنجليزي → كتابة عربية</title>
+
+  <!-- إعدادات PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+  <meta name="theme-color" content="#0078d7">
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: #f3f7fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      padding: 25px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .main-btn {
+      margin-top: 12px;
+      padding: 10px 16px;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #0078d7;
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+    }
+    .main-btn:hover {
+      background: #005fa3;
+    }
+    .output {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #eef5ff;
+      font-size: 22px;
+      text-align: center;
+      min-height: 45px;
+    }
+    #installButton {
+      display: none;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      background-color: #28a745;
+      font-size: 16px;
+      width: auto;
+      border-radius: 50px;
+    }
+    #installButton:hover {
+      background-color: #1e7e34;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>حسابات الميزانية</h1>
-            <div class="date" id="currentDate"></div>
-        </header>
-        <input type="number" id="inputField" placeholder="الميزانية المتبقية">
-        <table id="resultTable" style="display: none;">
-            <thead>
-                <tr>
-                    <th>الميزانية المتبقية</th>
-                    <th>عدد الأيام</th>
-                    <th>المصروف اليومي</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <table id="expenseTable" style="display: none;">
-            <thead>
-                <tr>
-                    <th>الرقم</th>
-                    <th>مبلغ الصرف اليومي</th>
-                    <th>حذف</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="2">مجموع الصرف اليومي</td>
-                    <td id="totalExpense">0</td>
-                </tr>
-            </tfoot>
-        </table>
-        <div class="button-container">
-            <button class="reset-btn" onclick="resetAll()">تصفير جميع الحقول</button>
-            <button class="print-btn" onclick="window.print()">طباعة كشف</button>
-        </div>
-    </div>
+  <div class="card">
+    <h1>مترجم صوتي إنجليزي → كتابة عربية</h1>
+    <input type="text" id="inputWord" placeholder="أدخل كلمة مثل: go أو school أو communication" />
+    <button id="translateBtn" class="main-btn">ترجم</button>
+    <div class="output" id="result">النتيجة ستظهر هنا...</div>
+    <button id="installButton" class="main-btn">تثبيت التطبيق 📲</button>
+  </div>
 
-    <script>
-        const inputField = document.getElementById('inputField');
-        const resultTable = document.getElementById('resultTable');
-        const expenseTable = document.getElementById('expenseTable');
-        const resultTbody = resultTable.querySelector('tbody');
-        const expenseTbody = expenseTable.querySelector('tbody');
-        const totalExpenseCell = document.getElementById('totalExpense');
-        const currentDateElement = document.getElementById('currentDate');
-
-        let budget, days, dailyExpense;
-
-        // تحديد اليوم الحالي والشهر الحالي
-        const currentDate = new Date();
-        currentDateElement.textContent = `التاريخ: ${currentDate.toLocaleDateString('ar-EG')}`;
-
-        // حساب الأيام المتبقية بناءً على النظام من 27 إلى 26
-        function calculateRemainingDays() {
-            const currentDay = currentDate.getDate();
-            let remainingDays;
-            if (currentDay >= 27) {
-                remainingDays = 26 - currentDay + 1 + new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-            } else {
-                remainingDays = 26 - currentDay + 1;
-            }
-            return remainingDays;
-        }
-
-        function updateResultTable() {
-            resultTbody.innerHTML = `
-                <tr>
-                    <td>${budget}</td>
-                    <td>${days}</td>
-                    <td>${dailyExpense}</td>
-                </tr>
-            `;
-            resultTable.style.display = 'table';
-            localStorage.setItem('budget', budget);
-            localStorage.setItem('days', days);
-            localStorage.setItem('dailyExpense', dailyExpense);
-        }
-
-        function addExpenseToTable(expense) {
-            const row = document.createElement('tr');
-            const index = expenseTbody.rows.length + 1;
-            row.innerHTML = `
-                <td>${index}</td>
-                <td>${expense}</td>
-                <td><button class="delete-btn" onclick="deleteExpense(this, ${expense})">حذف</button></td>
-            `;
-            expenseTbody.appendChild(row);
-            updateTotalExpense();
-            expenseTable.style.display = 'table';
-            saveExpenses();
-        }
-
-        function deleteExpense(button, expense) {
-            const row = button.parentElement.parentElement;
-            expenseTbody.removeChild(row);
-            budget += expense;
-            dailyExpense = Math.floor(budget / days);
-            updateResultTable();
-            updateTotalExpense();
-            saveExpenses();
-        }
-
-        function updateTotalExpense() {
-            let totalExpense = 0;
-            expenseTbody.querySelectorAll('tr').forEach(row => {
-                totalExpense += parseInt(row.cells[1].textContent);
-            });
-            totalExpenseCell.textContent = totalExpense;
-        }
-
-        function saveExpenses() {
-            const expenses = [];
-            expenseTbody.querySelectorAll('tr').forEach(row => {
-                const expense = parseInt(row.cells[1].textContent);
-                expenses.push(expense);
-            });
-            localStorage.setItem('expenses', JSON.stringify(expenses));
-        }
-
-        function loadExpenses() {
-            const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-            expenses.forEach((expense, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${expense}</td>
-                    <td><button class="delete-btn" onclick="deleteExpense(this, ${expense})">حذف</button></td>
-                `;
-                expenseTbody.appendChild(row);
-            });
-            updateTotalExpense();
-            if (expenses.length > 0) {
-                expenseTable.style.display = 'table';
-            }
-        }
-
-        function resetAll() {
-            if (confirm('هل أنت متأكد من تصفير جميع الحقول؟')) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        inputField.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                if (inputField.placeholder === 'الميزانية المتبقية') {
-                    budget = parseInt(inputField.value);
-                    if (!isNaN(budget)) {
-                        days = calculateRemainingDays();
-                        dailyExpense = Math.floor(budget / days);
-                        updateResultTable();
-                        inputField.placeholder = 'الصرف اليومي';
-                        inputField.value = '';
-                        inputField.focus();
-                    }
-                } else if (inputField.placeholder === 'الصرف اليومي') {
-                    const expense = parseInt(inputField.value);
-                    if (!isNaN(expense)) {
-                        budget -= expense;
-                        dailyExpense = Math.floor(budget / days);
-                        updateResultTable();
-                        addExpenseToTable(expense);
-                        inputField.value = '';
-                    }
-                }
-            }
+  <script>
+    // تسجيل Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+          console.log('✅ ServiceWorker مسجل بنجاح');
+        }, function(err) {
+          console.log('❌ فشل تسجيل ServiceWorker:', err);
         });
+      });
+    }
 
-        window.addEventListener('load', function() {
-            budget = parseInt(localStorage.getItem('budget')) || 0;
-            days = calculateRemainingDays();
-            dailyExpense = budget ? Math.floor(budget / days) : 0;
-            const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    // زر التثبيت
+    let deferredPrompt;
+    const installButton = document.getElementById('installButton');
 
-            if (expenses.length > 0) {
-                loadExpenses();
-                updateResultTable();
-                inputField.placeholder = 'الصرف اليومي';
-            } else {
-                inputField.placeholder = 'الميزانية المتبقية';
-            }
-            inputField.focus();
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installButton.style.display = 'block';
+    });
+
+    installButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('✅ المستخدم وافق على التثبيت');
+          } else {
+            console.log('❌ المستخدم رفض التثبيت');
+          }
+          installButton.style.display = 'none';
+          deferredPrompt = null;
         });
-    </script>
+      }
+    });
+
+    // منطق الترجمة
+    const exceptions = {
+      "go": "قو", "school": "إسكول", "know": "نو",
+      "communication": "كوميونيكيشن", "nation": "نيشن", "station": "ستيشن"
+    };
+
+    const map = [
+      ['tion', 'شن'], ['sion', 'جن'], ['sch', 'إسك'], ['kn', 'ن'], ['ph', 'ف'],
+      ['sh', 'ش'], ['ch', 'تش'], ['th', 'ث'], ['ck', 'ك'], ['oo', 'وو'],
+      ['ee', 'ي'], ['ou', 'او'], ['ow', 'و'], ['qu', 'كو'], ['ci', 'سي'],
+      ['ge', 'ج'], ['gi', 'ج'],
+      ['a', 'ا'], ['b', 'ب'], ['c', 'ك'], ['d', 'د'], ['e', 'ي'],
+      ['f', 'ف'], ['g', 'ج'], ['h', 'ه'], ['i', 'ي'], ['j', 'ج'],
+      ['k', 'ك'], ['l', 'ل'], ['m', 'م'], ['n', 'ن'], ['o', 'و'],
+      ['p', 'ب'], ['q', 'ك'], ['r', 'ر'], ['s', 'س'], ['t', 'ت'],
+      ['u', 'و'], ['v', 'ف'], ['w', 'و'], ['x', 'كس'], ['y', 'ي'],
+      ['z', 'ز']
+    ];
+
+    function simplify(word) {
+      return word.replace(/([a-z])\1+/g, "$1");
+    }
+
+    function transliterate(word) {
+      let w = simplify(word.toLowerCase().trim());
+      let out = '';
+      while (w.length > 0) {
+        let matched = false;
+        for (const [eng, arb] of map) {
+          if (w.startsWith(eng)) {
+            out += arb;
+            w = w.slice(eng.length);
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) w = w.slice(1);
+      }
+      return out;
+    }
+
+    document.getElementById("translateBtn").addEventListener("click", () => {
+      const input = document.getElementById("inputWord").value.trim().toLowerCase();
+      const result = document.getElementById("result");
+
+      if (!input) {
+        result.textContent = "أدخل كلمة أولاً.";
+        return;
+      }
+
+      if (exceptions[input]) {
+        result.textContent = exceptions[input];
+        return;
+      }
+
+      const output = transliterate(input);
+      result.textContent = output || "لم أتمكن من التحويل بدقة.";
+    });
+  </script>
 </body>
 </html>
