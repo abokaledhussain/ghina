@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مولّد تطبيق ويب iPhone</title>
+<title>مولّد تطبيق ويب iPhone (نسخة مستقرة)</title>
 <style>
 body {
   font-family: "Tahoma", sans-serif;
@@ -15,10 +15,6 @@ body {
   height: 100vh;
   margin: 0;
 }
-h1 {
-  color: #333;
-  margin-bottom: 20px;
-}
 form {
   background: white;
   padding: 20px;
@@ -27,26 +23,19 @@ form {
   width: 90%;
   max-width: 400px;
 }
-label {
-  display: block;
-  margin: 10px 0 5px;
-  color: #333;
-}
 input[type="text"], input[type="url"] {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
-}
-input[type="file"] {
-  margin-top: 5px;
+  margin-bottom: 10px;
 }
 button {
   background-color: #007aff;
   color: white;
   border: none;
-  padding: 10px 20px;
-  margin-top: 15px;
+  padding: 10px;
+  margin-top: 10px;
   border-radius: 8px;
   cursor: pointer;
   width: 100%;
@@ -54,13 +43,21 @@ button {
 button:hover {
   background-color: #005fcc;
 }
-small {
-  color: #666;
+textarea {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  margin-top: 10px;
+  padding: 10px;
+  direction: ltr;
+  font-family: monospace;
+  font-size: 12px;
 }
 </style>
 </head>
 <body>
-  <h1>📱 مولّد تطبيق ويب iPhone</h1>
+  <h2>📱 مولّد تطبيق ويب iPhone</h2>
   <form id="generatorForm">
     <label>اسم التطبيق:</label>
     <input type="text" id="appName" placeholder="مثلاً: موقعي" required>
@@ -68,11 +65,11 @@ small {
     <label>رابط الموقع:</label>
     <input type="url" id="appURL" placeholder="https://example.com" required>
 
-    <label>أيقونة (اختياري PNG):</label>
-    <input type="file" id="appIcon" accept="image/png">
-
-    <button type="button" onclick="generateConfig()">توليد الملف</button>
+    <button type="button" onclick="generateProfile()">توليد الملف</button>
   </form>
+
+  <textarea id="output" readonly placeholder="سيظهر هنا محتوى ملف التعريف..."></textarea>
+  <button id="saveBtn" style="display:none;" onclick="saveFile()">💾 حفظ الملف</button>
 
   <script>
     function generateUUID() {
@@ -82,23 +79,21 @@ small {
       });
     }
 
-    function generateConfig() {
-      const name = document.getElementById('appName').value.trim();
-      const url = document.getElementById('appURL').value.trim();
-      const iconFile = document.getElementById('appIcon').files[0];
+    function generateProfile() {
+      const name = document.getElementById("appName").value.trim();
+      const url = document.getElementById("appURL").value.trim();
+      const output = document.getElementById("output");
+      const saveBtn = document.getElementById("saveBtn");
 
       if (!name || !url) {
         alert("يرجى إدخال اسم التطبيق والرابط.");
         return;
       }
 
-      const readIcon = iconFile ? toBase64(iconFile) : Promise.resolve("");
+      const payloadUUID = generateUUID();
+      const profileUUID = generateUUID();
 
-      readIcon.then(iconBase64 => {
-        const payloadUUID = generateUUID();
-        const profileUUID = generateUUID();
-
-        const plist = `<?xml version="1.0" encoding="UTF-8"?>
+      const plist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -108,42 +103,44 @@ small {
    <key>FullScreen</key><true/>
    <key>IgnoreManifestScope</key><true/>
    <key>IsRemovable</key><true/>
-   ${iconBase64 ? `<key>Icon</key><data>${iconBase64}</data>` : ""}
    <key>Label</key><string>${name}</string>
    <key>PayloadDescription</key><string>تطبيق ${name}</string>
    <key>PayloadDisplayName</key><string>${name}</string>
    <key>PayloadIdentifier</key><string>me.hussain.${name.toLowerCase().replace(/\s+/g, '')}</string>
    <key>PayloadOrganization</key><string>Hussain Alaryani</string>
-   <key>PayloadType</key><string>com.apple.webClip.managed</key>
+   <key>PayloadType</key><string>com.apple.webClip.managed</string>
    <key>PayloadUUID</key><string>${payloadUUID}</string>
    <key>PayloadVersion</key><integer>1</integer>
    <key>Precomposed</key><true/>
    <key>URL</key><string>${url}</string>
   </dict>
  </array>
+ <key>PayloadDescription</key><string>ملف تثبيت تطبيق ويب</string>
  <key>PayloadDisplayName</key><string>${name}</string>
  <key>PayloadIdentifier</key><string>me.hussain.profile.${name.toLowerCase().replace(/\s+/g, '')}</string>
+ <key>PayloadRemovalDisallowed</key><false/>
  <key>PayloadType</key><string>Configuration</string>
  <key>PayloadUUID</key><string>${profileUUID}</string>
  <key>PayloadVersion</key><integer>1</integer>
 </dict>
 </plist>`;
 
-        const blob = new Blob([plist], { type: "application/x-apple-aspen-config" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `${name}.mobileconfig`;
-        link.click();
-      });
+      output.value = plist;
+      saveBtn.style.display = "block";
+      alert("✅ تم توليد ملف التعريف.\nانسخ النص أو احفظ الملف لتثبيته من تطبيق الملفات.");
     }
 
-    function toBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = error => reject(error);
-      });
+    function saveFile() {
+      const text = document.getElementById("output").value;
+      if (!text) {
+        alert("لم يتم توليد أي ملف بعد.");
+        return;
+      }
+      const blob = new Blob([text], { type: "application/x-apple-aspen-config" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "webclip.mobileconfig";
+      a.click();
     }
   </script>
 </body>
