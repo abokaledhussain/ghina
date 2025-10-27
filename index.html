@@ -21,15 +21,21 @@
       --card-bg: white;
       --speaker-color: #f4b400; /* لون جديد لزر النطق */
     }
+    
+    /* 💥💥 التحديث: إزالة شريط التمرير من الصفحة 💥💥 */
     body {
       font-family: 'Poppins', "Segoe UI", Tahoma, sans-serif;
       background: var(--bg-light);
       display: flex;
+      flex-direction: column; /* للسماح بترتيب العناصر رأسيًا */
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh; /* تحديد ارتفاع 100% من النافذة */
       margin: 0;
       padding: 20px;
+      
+      /* منع التمرير */
+      overflow: hidden; 
     }
     .card {
       background: var(--card-bg);
@@ -38,7 +44,22 @@
       padding: 30px;
       width: 100%;
       max-width: 550px;
+      /* لضمان أن البطاقة لا تسبب تجاوزًا رأسيًا في حال كانت أطول من الشاشة */
+      max-height: calc(100vh - 80px); 
+      overflow-y: auto; /* إذا أصبحت البطاقة طويلة، يمكن التمرير داخلها فقط */
     }
+    
+    /* 💥💥 إضافة ستايل للعبارة الجديدة 💥💥 */
+    .footer-note {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #777;
+      text-align: center;
+      padding: 10px 0;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
     h1 {
       text-align: center;
       font-size: 26px;
@@ -49,10 +70,10 @@
     .input-container {
       position: relative;
       margin-bottom: 15px;
-      display: flex; /* لترتيب العناصر الداخلية */
+      display: flex;
     }
     #inputWord {
-      flex-grow: 1; /* ليأخذ المساحة المتبقية */
+      flex-grow: 1;
       padding: 15px 45px 15px 15px;
       border-radius: 12px;
       border: 2px solid #ddd;
@@ -64,11 +85,10 @@
       outline: none;
       border-color: var(--primary-color);
     }
-    /* تعديل موقع زري المسح والنطق ليصبحا داخل حقل الإدخال */
     .input-controls {
         position: absolute;
         top: 50%;
-        left: 10px; /* لتكون الأزرار على اليسار (الجانب الإنجليزي) */
+        left: 10px;
         transform: translateY(-50%);
         display: flex;
         gap: 5px;
@@ -93,14 +113,13 @@
 
     #speakBtn {
         color: var(--speaker-color);
-        display: none; /* يُخفى في البداية */
+        display: none;
     }
     #speakBtn:hover {
       color: orange;
       transform: scale(1.1);
     }
     
-    /* بقية الأنماط (الأزرار والنتائج) كما هي من التحسين السابق */
     .main-btn {
       margin-top: 10px;
       padding: 14px 20px;
@@ -197,7 +216,8 @@
       
       <div class="input-controls">
         <button id="clearInputBtn" title="مسح حقل الإدخال">✕</button>
-        <button id="speakBtn" title="نطق الكلمة">🗣️</button> </div>
+        <button id="speakBtn" title="نطق الكلمة">🗣️</button>
+      </div>
     </div>
     <button id="translateBtn" class="main-btn">ترجم الكلمة</button>
     
@@ -209,13 +229,15 @@
 
     <button id="installButton" class="main-btn">تثبيت التطبيق 📲</button>
   </div>
+  
+  <div class="footer-note">
+    برمجة حسين العرياني 💥
+  </div>
 
   <script>
-    // ** منطق Text-to-Speech **
     const synth = window.speechSynthesis;
     let englishVoice = null;
     
-    // محاولة الحصول على صوت إنجليزي عند تحميل القائمة
     function populateVoiceList() {
         if(synth.getVoices().length > 0) {
             englishVoice = synth.getVoices().find(voice => 
@@ -228,16 +250,14 @@
         }
     }
 
-    // الانتظار حتى يتم تحميل الأصوات
     if (synth.onvoiceschanged !== undefined) {
       synth.onvoiceschanged = populateVoiceList;
     }
-    populateVoiceList(); // محاولة التحميل الفوري
+    populateVoiceList();
 
     function speakWord(word) {
         if (!word.trim()) return;
 
-        // إيقاف أي نطق سابق
         if (synth.speaking) {
             synth.cancel();
         }
@@ -245,14 +265,13 @@
         const utterance = new SpeechSynthesisUtterance(word.trim());
         utterance.lang = 'en-US'; 
         utterance.voice = englishVoice;
-        utterance.pitch = 1; // درجة الصوت (عادة 1)
-        utterance.rate = 1;  // سرعة النطق (عادة 1)
+        utterance.pitch = 1;
+        utterance.rate = 1;
 
         synth.speak(utterance);
     }
-    // **********************************
 
-    // ... (بقية منطق PWA كما كان) ...
+    // PWA Logic (باقي المنطق)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js').then(function(registration) {
@@ -287,18 +306,16 @@
         });
       }
     });
-    // ---------------------------------
     
-    // منطق الترجمة والتحسينات
+    // Translation and UX Logic
     const inputField = document.getElementById("inputWord");
     const translateBtn = document.getElementById("translateBtn");
     const resultDiv = document.getElementById("result");
     const copyBtn = document.getElementById("copyBtn");
     const clearBtn = document.getElementById("clearInputBtn");
-    const speakBtn = document.getElementById("speakBtn"); // تم جلب زر النطق
+    const speakBtn = document.getElementById("speakBtn");
     const loader = document.getElementById("loader");
     
-    // قاعدة بيانات الترجمة الصوتية (Phonetic Transliteration) (بقية القواعد كما هي)
     const exceptions = {
       "go": "قو", "school": "إسكول", "know": "نو",
       "communication": "كوميونيكيشن", "nation": "نيشن", "station": "ستيشن",
@@ -306,14 +323,11 @@
     };
 
     const map = [
-      // قواعد متقدمة
       ['tion', 'شن'], ['sion', 'جن'], ['sch', 'إسك'], ['kn', 'ن'], 
       ['ph', 'ف'], ['gh', 'ف'], ['wr', 'ر'], ['tch', 'تش'], 
-      // مجموعات الحروف الشائعة
       ['sh', 'ش'], ['ch', 'تش'], ['th', 'ث'], ['ck', 'ك'], ['oo', 'وو'],
       ['ee', 'ي'], ['ou', 'او'], ['ow', 'و'], ['qu', 'كو'], ['ci', 'سي'],
       ['ge', 'ج'], ['gi', 'ج'], ['ea', 'ي'], ['ai', 'أي'],
-      // الأحرف المفردة
       ['a', 'ا'], ['b', 'ب'], ['c', 'ك'], ['d', 'د'], ['e', 'ي'],
       ['f', 'ف'], ['g', 'ج'], ['h', 'ه'], ['i', 'ي'], ['j', 'ج'],
       ['k', 'ك'], ['l', 'ل'], ['m', 'م'], ['n', 'ن'], ['o', 'و'],
@@ -342,9 +356,7 @@
         return out;
     }
 
-    // منطق حدث النقر على زر الترجمة (كما كان)
     translateBtn.addEventListener("click", () => {
-      // ... (تنفيذ الترجمة) ...
       const input = inputField.value.trim().toLowerCase();
       
       if (!input) {
@@ -373,34 +385,29 @@
       }, 500); 
     });
 
-    // منطق زر المسح (تم تحديثه لإخفاء زر النطق أيضًا)
     clearBtn.addEventListener("click", () => {
         inputField.value = '';
         clearBtn.style.display = 'none';
-        speakBtn.style.display = 'none'; // إخفاء زر النطق
+        speakBtn.style.display = 'none';
         resultDiv.textContent = "النتيجة ستظهر هنا...";
         copyBtn.style.display = 'none';
     });
     
-    // إظهار/إخفاء زري المسح والنطق عند الكتابة
     inputField.addEventListener("input", () => {
         const hasText = inputField.value.length > 0;
         clearBtn.style.display = hasText ? 'block' : 'none';
         
-        // إظهار زر النطق فقط إذا كان هناك نص ويمكن للنظام النطق
         if (window.speechSynthesis) {
             speakBtn.style.display = hasText ? 'block' : 'none';
         }
         
     });
     
-    // ** منطق النطق الصوتي **
     speakBtn.addEventListener("click", () => {
         const word = inputField.value.trim();
         speakWord(word);
     });
 
-    // منطق زر النسخ (كما كان)
     copyBtn.addEventListener("click", () => {
         const textToCopy = resultDiv.textContent;
         navigator.clipboard.writeText(textToCopy).then(() => {
@@ -414,7 +421,6 @@
         });
     });
 
-    // تمكين الترجمة عبر مفتاح Enter (كما كان)
     inputField.addEventListener("keypress", (event) => {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -422,7 +428,6 @@
         }
     });
 
-    // عند التحميل، إخفاء أزرار التحكم
     window.onload = () => {
         copyBtn.style.display = 'none';
         clearBtn.style.display = 'none';
