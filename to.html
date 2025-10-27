@@ -1,50 +1,44 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مولد تطبيق ويب لآيفون</title>
+<title>مولد Web Clip</title>
 <style>
 body {
-  font-family: "Tajawal", sans-serif;
-  direction: rtl;
+  font-family: "Cairo", sans-serif;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
   text-align: center;
-  background: #f2f2f2;
   padding: 20px;
 }
-input, select, button {
-  margin: 10px;
+.container {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  padding: 20px;
+  max-width: 400px;
+  margin: auto;
+}
+input, select, button, textarea {
+  width: 100%;
   padding: 10px;
-  border-radius: 8px;
+  margin: 8px 0;
+  border-radius: 10px;
   border: 1px solid #ccc;
-  width: 80%;
+  font-size: 16px;
+  box-sizing: border-box;
 }
 button {
-  background: #007aff;
+  background-color: #007bff;
   color: white;
   border: none;
   cursor: pointer;
-  font-size: 16px;
 }
 button:hover {
-  background: #0059c1;
+  background-color: #0056b3;
 }
-img {
-  max-width: 100px;
-  margin-top: 10px;
-  border-radius: 20%;
-  box-shadow: 0 0 5px #999;
-}
-.footer {
-  margin-top: 40px;
-  font-size: 16px;
-  color: #444;
-  font-weight: bold;
-  animation: glow 1.5s ease-in-out infinite alternate;
-}
-@keyframes glow {
-  from { color: #007aff; }
-  to { color: #ff0080; }
+textarea {
+  height: 160px;
 }
 </style>
 </head>
@@ -55,6 +49,7 @@ img {
 
 <input type="text" id="appName" placeholder="اسم التطبيق">
 <input type="url" id="appUrl" placeholder="رابط الموقع">
+  <h5>اختر ايقونة التطبيق 📸</h5>
 <input type="file" id="iconInput" accept="image/*">
 
 <select id="modeSelect">
