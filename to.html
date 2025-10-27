@@ -1,152 +1,154 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مولد تطبيق ويب لآيفون</title>
+<title>مولد صفحة Web Clip</title>
 <style>
 body {
-  font-family: "Tajawal", sans-serif;
-  direction: rtl;
+  font-family: "Cairo", sans-serif;
+  background: linear-gradient(135deg, #f0f4ff, #dce4ff);
   text-align: center;
-  background: #f2f2f2;
   padding: 20px;
+  color: #333;
+}
+.container {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  display: inline-block;
+  width: 90%;
+  max-width: 400px;
 }
 input, select, button {
-  margin: 10px;
+  width: 100%;
   padding: 10px;
-  border-radius: 8px;
+  margin: 8px 0;
+  border-radius: 10px;
   border: 1px solid #ccc;
-  width: 80%;
+  font-size: 16px;
 }
 button {
-  background: #007aff;
+  background-color: #4a67ff;
   color: white;
   border: none;
   cursor: pointer;
-  font-size: 16px;
 }
 button:hover {
-  background: #0059c1;
+  background-color: #3452ff;
 }
-img {
-  max-width: 100px;
+textarea {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
   margin-top: 10px;
-  border-radius: 20%;
-  box-shadow: 0 0 5px #999;
-}
-.footer {
-  margin-top: 40px;
-  font-size: 16px;
-  color: #444;
-  font-weight: bold;
-  animation: glow 1.5s ease-in-out infinite alternate;
-}
-@keyframes glow {
-  from { color: #007aff; }
-  to { color: #ff0080; }
 }
 </style>
 </head>
 <body>
+<h2>📱 مولد صفحة Web Clip</h2>
+<div class="container">
+  <label>🔗 رابط الموقع:</label>
+  <input type="url" id="url" placeholder="أدخل رابط الموقع" required>
 
-<h2>📱 مولد تطبيق ويب لآيفون</h2>
-<p>أدخل بياناتك ثم اضغط "توليد ملف التعريف"</p>
+  <label>🖼 أيقونة (اختياري):</label>
+  <input type="url" id="icon" placeholder="رابط الأيقونة">
 
-<input type="text" id="appName" placeholder="اسم التطبيق">
-<input type="url" id="appUrl" placeholder="رابط الموقع">
-<input type="file" id="iconInput" accept="image/*">
+  <label>💻 نوع الصفحة:</label>
+  <select id="mode">
+    <option value="mobile">صفحة جوال</option>
+    <option value="desktop">صفحة كمبيوتر</option>
+  </select>
 
-<select id="modeSelect">
-  <option value="mobile">📱 صفحة جوال</option>
-  <option value="desktop">💻 صفحة كمبيوتر</option>
-</select>
+  <button onclick="generate()">توليد الصفحة</button>
 
-<br>
-<img id="preview" style="display:none;"/><br>
-<button onclick="generateProfile()">توليد ملف التعريف</button>
-
-<p class="footer">برمجة حسين العرياني 💥</p>
+  <h3>📄 الكود الناتج:</h3>
+  <textarea id="output" readonly></textarea>
+</div>
 
 <script>
-function generateProfile() {
-  const appName = document.getElementById("appName").value || "تطبيقي";
-  const appUrl = document.getElementById("appUrl").value;
-  const iconInput = document.getElementById("iconInput");
-  const mode = document.getElementById("modeSelect").value;
+function generate() {
+  const url = document.getElementById("url").value.trim();
+  const icon = document.getElementById("icon").value.trim();
+  const mode = document.getElementById("mode").value;
   
-  if (!appUrl) {
-    alert("يرجى إدخال رابط الموقع أولاً");
+  if (!url) {
+    alert("الرجاء إدخال رابط الموقع");
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const iconBase64 = e.target.result.replace(/^data:image\/(png|jpeg);base64,/, '');
-    const uuid = crypto.randomUUID();
+  let style = `
+    body {
+      margin:0;
+      background:#fff;
+      color:#000;
+      font-family: sans-serif;
+    }
+    iframe {
+      border:none;
+      width:100%;
+      height:100vh;
+    }
+    .nav-btns {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+    }
+    .nav-btns button {
+      background: rgba(0,0,0,0.6);
+      border:none;
+      border-radius: 50%;
+      color:white;
+      font-size:18px;
+      width:40px;
+      height:40px;
+    }
+  `;
 
-    // تعديل إعدادات الشاشة حسب الاختيار
-    const isFullScreen = mode === "mobile" ? "<true/>" : "<false/>";
-
-    const profile = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
- <key>PayloadContent</key>
- <array>
-  <dict>
-   <key>FullScreen</key>${isFullScreen}
-   <key>IgnoreManifestScope</key><true/>
-   <key>Icon</key><data>${iconBase64}</data>
-   <key>IsRemovable</key><true/>
-   <key>Label</key><string>${appName}</string>
-   <key>PayloadDescription</key><string>${appName}</string>
-   <key>PayloadDisplayName</key><string>${appName}</string>
-   <key>PayloadIdentifier</key><string>com.hussain.${uuid}</string>
-   <key>PayloadOrganization</key><string>برمجة حسين العرياني</string>
-   <key>PayloadType</key><string>com.apple.webClip.managed</string>
-   <key>PayloadUUID</key><string>${uuid}</string>
-   <key>PayloadVersion</key><integer>1</integer>
-   <key>Precomposed</key><true/>
-   <key>URL</key><string>${appUrl}</string>
-  </dict>
- </array>
- <key>PayloadDescription</key><string>برمجة حسين العرياني</string>
- <key>PayloadDisplayName</key><string>${appName}</string>
- <key>PayloadIdentifier</key><string>profile.${uuid}</string>
- <key>PayloadType</key><string>Configuration</string>
- <key>PayloadUUID</key><string>${uuid}</string>
- <key>PayloadVersion</key><integer>1</integer>
-</dict>
-</plist>`;
-
-    const blob = new Blob([profile], { type: "application/x-apple-aspen-config" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = appName + ".mobileconfig";
-    link.click();
-  };
-
-  if (iconInput.files[0]) {
-    reader.readAsDataURL(iconInput.files[0]);
-  } else {
-    reader.onload({ target: { result: "data:image/png;base64," } }); // بدون أيقونة
+  // إذا اختار "كمبيوتر" نضبط تنسيقها لتبدو أوسع
+  if (mode === "desktop") {
+    style += `
+      @media (min-width: 768px) {
+        iframe {
+          width: 90%;
+          margin: 20px auto;
+          display: block;
+          height: 90vh;
+          border-radius: 10px;
+          box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+      }
+    `;
   }
+
+  const html = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+${icon ? `<link rel="apple-touch-icon" href="${icon}">` : ""}
+<title>موقعي</title>
+<style>${style}</style>
+</head>
+<body>
+<iframe src="${url}" id="frame"></iframe>
+<div class="nav-btns">
+  <button onclick="history.back()">⏪</button>
+  <button onclick="history.forward()">⏩</button>
+</div>
+<p style="text-align:center;font-size:14px;color:gray;">برمجة حسين العرياني💥</p>
+</body>
+</html>
+  `.trim();
+
+  document.getElementById("output").value = html;
 }
-
-document.getElementById("iconInput").addEventListener("change", e => {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = document.getElementById("preview");
-      img.src = ev.target.result;
-      img.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  }
-});
 </script>
-
 </body>
 </html>
