@@ -3,127 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مولد صفحة Web Clip</title>
+<title>مولد Web Clip</title>
 <style>
 body {
   font-family: "Cairo", sans-serif;
-  background: linear-gradient(135deg, #f0f4ff, #dce4ff);
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
   text-align: center;
   padding: 20px;
-  color: #333;
 }
 .container {
   background: white;
-  padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  display: inline-block;
-  width: 90%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  padding: 20px;
   max-width: 400px;
+  margin: auto;
 }
-input, select, button {
+input, select, button, textarea {
   width: 100%;
   padding: 10px;
   margin: 8px 0;
   border-radius: 10px;
   border: 1px solid #ccc;
   font-size: 16px;
+  box-sizing: border-box;
 }
 button {
-  background-color: #4a67ff;
+  background-color: #007bff;
   color: white;
   border: none;
   cursor: pointer;
 }
 button:hover {
-  background-color: #3452ff;
+  background-color: #0056b3;
 }
 textarea {
-  width: 100%;
-  height: 150px;
-  border-radius: 10px;
-  margin-top: 10px;
+  height: 160px;
 }
 </style>
 </head>
 <body>
-<h2>📱 مولد صفحة Web Clip</h2>
-<div class="container">
-  <label>🔗 رابط الموقع:</label>
-  <input type="url" id="url" placeholder="أدخل رابط الموقع" required>
 
-  <label>🖼 أيقونة (اختياري):</label>
-  <input type="url" id="icon" placeholder="رابط الأيقونة">
+<h2>⚙️ مولد صفحة Web Clip</h2>
+<div class="container">
+  <label>📛 اسم التطبيق:</label>
+  <input type="text" id="appName" placeholder="مثلاً: موقعي الجميل">
+
+  <label>🔗 رابط الموقع:</label>
+  <input type="url" id="appURL" placeholder="https://example.com">
+
+  <label>🖼 رابط الأيقونة (اختياري):</label>
+  <input type="url" id="appIcon" placeholder="https://example.com/icon.png">
 
   <label>💻 نوع الصفحة:</label>
   <select id="mode">
-    <option value="mobile">صفحة جوال</option>
-    <option value="desktop">صفحة كمبيوتر</option>
+    <option value="mobile">📱 صفحة جوال</option>
+    <option value="desktop">💻 صفحة كمبيوتر</option>
   </select>
 
-  <button onclick="generate()">توليد الصفحة</button>
+  <button onclick="generateCode()">🚀 توليد الصفحة</button>
 
   <h3>📄 الكود الناتج:</h3>
-  <textarea id="output" readonly></textarea>
+  <textarea id="result" readonly></textarea>
 </div>
 
 <script>
-function generate() {
-  const url = document.getElementById("url").value.trim();
-  const icon = document.getElementById("icon").value.trim();
+function generateCode() {
+  const name = document.getElementById("appName").value.trim() || "تطبيقي";
+  const url = document.getElementById("appURL").value.trim();
+  const icon = document.getElementById("appIcon").value.trim();
   const mode = document.getElementById("mode").value;
-  
+
   if (!url) {
     alert("الرجاء إدخال رابط الموقع");
     return;
   }
 
-  let style = `
-    body {
-      margin:0;
-      background:#fff;
-      color:#000;
-      font-family: sans-serif;
-    }
+  // تصميم iframe حسب نوع الصفحة
+  let iframeStyle = `
     iframe {
       border:none;
       width:100%;
       height:100vh;
-    }
-    .nav-btns {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
-    }
-    .nav-btns button {
-      background: rgba(0,0,0,0.6);
-      border:none;
-      border-radius: 50%;
-      color:white;
-      font-size:18px;
-      width:40px;
-      height:40px;
-    }
-  `;
+    }`;
 
-  // إذا اختار "كمبيوتر" نضبط تنسيقها لتبدو أوسع
+  // لو اختار كمبيوتر نوسع الصفحة ونضيف ظل
   if (mode === "desktop") {
-    style += `
-      @media (min-width: 768px) {
+    iframeStyle += `
+      @media (min-width:768px){
         iframe {
-          width: 90%;
-          margin: 20px auto;
-          display: block;
-          height: 90vh;
-          border-radius: 10px;
-          box-shadow: 0 0 15px rgba(0,0,0,0.1);
+          width:90%;
+          margin:20px auto;
+          display:block;
+          border-radius:10px;
+          box-shadow:0 0 15px rgba(0,0,0,0.2);
+          height:90vh;
         }
-      }
-    `;
+      }`;
   }
 
   const html = `
@@ -133,8 +109,33 @@ function generate() {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 ${icon ? `<link rel="apple-touch-icon" href="${icon}">` : ""}
-<title>موقعي</title>
-<style>${style}</style>
+<title>${name}</title>
+<style>
+body {
+  margin:0;
+  background:white;
+  font-family: "Cairo", sans-serif;
+}
+${iframeStyle}
+.nav-btns {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
+}
+.nav-btns button {
+  background: rgba(0,0,0,0.6);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+}
+</style>
 </head>
 <body>
 <iframe src="${url}" id="frame"></iframe>
@@ -142,13 +143,13 @@ ${icon ? `<link rel="apple-touch-icon" href="${icon}">` : ""}
   <button onclick="history.back()">⏪</button>
   <button onclick="history.forward()">⏩</button>
 </div>
-<p style="text-align:center;font-size:14px;color:gray;">برمجة حسين العرياني💥</p>
+<p style="text-align:center;color:gray;font-size:14px;">برمجة حسين العرياني💥</p>
 </body>
-</html>
-  `.trim();
+</html>`;
 
-  document.getElementById("output").value = html;
+  document.getElementById("result").value = html.trim();
 }
 </script>
+
 </body>
 </html>
