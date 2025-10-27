@@ -24,6 +24,7 @@ button {
   color: white;
   border: none;
   cursor: pointer;
+  font-size: 16px;
 }
 button:hover {
   background: #0059c1;
@@ -31,6 +32,19 @@ button:hover {
 img {
   max-width: 100px;
   margin-top: 10px;
+  border-radius: 20%;
+  box-shadow: 0 0 5px #999;
+}
+.footer {
+  margin-top: 40px;
+  font-size: 16px;
+  color: #444;
+  font-weight: bold;
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  from { color: #007aff; }
+  to { color: #ff0080; }
 }
 </style>
 </head>
@@ -45,6 +59,8 @@ img {
 <br>
 <img id="preview" style="display:none;"/><br>
 <button onclick="generateProfile()">توليد ملف التعريف</button>
+
+<p class="footer">برمجة حسين العرياني 💥</p>
 
 <script>
 function generateProfile() {
