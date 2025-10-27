@@ -12,7 +12,7 @@ body {
   background: #f2f2f2;
   padding: 20px;
 }
-input, button {
+input, select, button {
   margin: 10px;
   padding: 10px;
   border-radius: 8px;
@@ -56,6 +56,12 @@ img {
 <input type="text" id="appName" placeholder="اسم التطبيق">
 <input type="url" id="appUrl" placeholder="رابط الموقع">
 <input type="file" id="iconInput" accept="image/*">
+
+<select id="modeSelect">
+  <option value="mobile">📱 صفحة جوال</option>
+  <option value="desktop">💻 صفحة كمبيوتر</option>
+</select>
+
 <br>
 <img id="preview" style="display:none;"/><br>
 <button onclick="generateProfile()">توليد ملف التعريف</button>
@@ -67,6 +73,7 @@ function generateProfile() {
   const appName = document.getElementById("appName").value || "تطبيقي";
   const appUrl = document.getElementById("appUrl").value;
   const iconInput = document.getElementById("iconInput");
+  const mode = document.getElementById("modeSelect").value;
   
   if (!appUrl) {
     alert("يرجى إدخال رابط الموقع أولاً");
@@ -78,54 +85,9 @@ function generateProfile() {
     const iconBase64 = e.target.result.replace(/^data:image\/(png|jpeg);base64,/, '');
     const uuid = crypto.randomUUID();
 
-    // كود أزرار الرجوع والتقدم ليتم إضافته تلقائياً داخل صفحة التطبيق
-    const navButtonsCode = `
-<!-- أزرار رجوع وتقدم صغيرة -->
-<style>
-.nav-buttons {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  display: flex;
-  gap: 8px;
-  z-index: 9999;
-}
-.nav-btn {
-  background: rgba(0, 0, 0, 0.4);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  font-size: 14px;
-  line-height: 28px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.nav-btn:hover {
-  background: #007aff;
-}
-</style>
-<div class='nav-buttons'>
-  <button class='nav-btn' onclick='history.back()'>⬅️</button>
-  <button class='nav-btn' onclick='history.forward()'>➡️</button>
-</div>`;
+    // تعديل إعدادات الشاشة حسب الاختيار
+    const isFullScreen = mode === "mobile" ? "<true/>" : "<false/>";
 
-    const injectedUrl = appUrl.includes("?") 
-      ? appUrl + "&navbuttons=1" 
-      : appUrl + "?navbuttons=1";
-
-    const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(`
-<!DOCTYPE html>
-<html lang="ar">
-<head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1.0'></head>
-<body style='margin:0;padding:0;'>
-<iframe src='${injectedUrl}' style='width:100vw;height:100vh;border:none;'></iframe>
-${navButtonsCode}
-</body>
-</html>`)}`
-    
     const profile = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -133,7 +95,7 @@ ${navButtonsCode}
  <key>PayloadContent</key>
  <array>
   <dict>
-   <key>FullScreen</key><true/>
+   <key>FullScreen</key>${isFullScreen}
    <key>IgnoreManifestScope</key><true/>
    <key>Icon</key><data>${iconBase64}</data>
    <key>IsRemovable</key><true/>
@@ -146,7 +108,7 @@ ${navButtonsCode}
    <key>PayloadUUID</key><string>${uuid}</string>
    <key>PayloadVersion</key><integer>1</integer>
    <key>Precomposed</key><true/>
-   <key>URL</key><string>${dataUrl}</string>
+   <key>URL</key><string>${appUrl}</string>
   </dict>
  </array>
  <key>PayloadDescription</key><string>برمجة حسين العرياني</string>
