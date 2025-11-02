@@ -1,438 +1,146 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>مترجم صوتي إنجليزي → كتابة عربية | مع نطق</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/images/icon-192x192.png">
-  <meta name="theme-color" content="#1a73e8">
-
-  <style>
-    :root {
-      --primary-color: #1a73e8;
-      --primary-hover: #155bb9;
-      --success-color: #28a745;
-      --text-color: #333;
-      --bg-light: #f5f8fa;
-      --card-bg: white;
-      --speaker-color: #f4b400; /* لون جديد لزر النطق */
-    }
-    
-    /* 💥💥 التحديث: إزالة شريط التمرير من الصفحة 💥💥 */
-    body {
-      font-family: 'Poppins', "Segoe UI", Tahoma, sans-serif;
-      background: var(--bg-light);
-      display: flex;
-      flex-direction: column; /* للسماح بترتيب العناصر رأسيًا */
-      justify-content: center;
-      align-items: center;
-      height: 100vh; /* تحديد ارتفاع 100% من النافذة */
-      margin: 0;
-      padding: 20px;
-      
-      /* منع التمرير */
-      overflow: hidden; 
-    }
-    .card {
-      background: var(--card-bg);
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-      padding: 30px;
-      width: 100%;
-      max-width: 550px;
-      /* لضمان أن البطاقة لا تسبب تجاوزًا رأسيًا في حال كانت أطول من الشاشة */
-      max-height: calc(100vh - 80px); 
-      overflow-y: auto; /* إذا أصبحت البطاقة طويلة، يمكن التمرير داخلها فقط */
-    }
-    
-    /* 💥💥 إضافة ستايل للعبارة الجديدة 💥💥 */
-    .footer-note {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #777;
-      text-align: center;
-      padding: 10px 0;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 26px;
-      color: var(--text-color);
-      margin-bottom: 25px;
-      font-weight: 600;
-    }
-    .input-container {
-      position: relative;
-      margin-bottom: 15px;
-      display: flex;
-    }
-    #inputWord {
-      flex-grow: 1;
-      padding: 15px 45px 15px 15px;
-      border-radius: 12px;
-      border: 2px solid #ddd;
-      font-size: 18px;
-      box-sizing: border-box;
-      transition: border-color 0.3s;
-    }
-    #inputWord:focus {
-      outline: none;
-      border-color: var(--primary-color);
-    }
-    .input-controls {
-        position: absolute;
-        top: 50%;
-        left: 10px;
-        transform: translateY(-50%);
-        display: flex;
-        gap: 5px;
-    }
-
-    #clearInputBtn, #speakBtn {
-      background: none;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 5px;
-      transition: color 0.2s;
-    }
-    
-    #clearInputBtn {
-      color: #999;
-      display: none; 
-    }
-    #clearInputBtn:hover {
-      color: var(--primary-color);
-    }
-
-    #speakBtn {
-        color: var(--speaker-color);
-        display: none;
-    }
-    #speakBtn:hover {
-      color: orange;
-      transform: scale(1.1);
-    }
-    
-    .main-btn {
-      margin-top: 10px;
-      padding: 14px 20px;
-      font-size: 17px;
-      border: none;
-      border-radius: 12px;
-      color: #fff;
-      cursor: pointer;
-      width: 100%;
-      font-weight: 600;
-      transition: background 0.3s, transform 0.1s;
-      background-image: linear-gradient(45deg, #4285f4, #1a73e8);
-    }
-    .main-btn:hover {
-      background-image: linear-gradient(45deg, #3c75d4, #155bb9);
-      box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4);
-    }
-    .main-btn:active {
-      transform: scale(0.99);
-    }
-    .output-container {
-      margin-top: 25px;
-      position: relative;
-      background: var(--bg-light);
-      border-radius: 12px;
-      min-height: 60px;
-      padding: 15px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-    }
-    #result {
-      font-size: 24px;
-      color: var(--text-color);
-      font-weight: 600;
-      text-align: center;
-      word-break: break-word;
-      flex-grow: 1;
-      padding-right: 40px;
-    }
-    .copy-btn {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--primary-color);
-      cursor: pointer;
-      padding: 5px;
-      font-size: 20px;
-      opacity: 0.7;
-      transition: opacity 0.2s, color 0.2s;
-    }
-    .copy-btn:hover {
-      opacity: 1;
-      color: var(--primary-hover);
-    }
-    #installButton {
-      display: none;
-      margin: 25px auto 0;
-      padding: 12px 25px;
-      background-color: var(--success-color);
-      font-size: 16px;
-      width: auto;
-      border-radius: 50px;
-      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
-    }
-    #installButton:hover {
-      background-color: #1e7e34;
-    }
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid var(--primary-color);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-      display: none;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مترجم صوتي إنجليزي → كتابة عربية | مع نطق</title>
+<style>
+body {
+  font-family: "Cairo", sans-serif;
+  text-align: center;
+  background: #f4f6f9;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+}
+h1 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+input, button {
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  width: 90%;
+  margin: 8px auto;
+  display: block;
+  box-sizing: border-box;
+}
+button {
+  width: auto;
+  background: #3498db;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover {
+  background: #2980b9;
+}
+#output {
+  background: #fff;
+  border: 1px solid #ccc;
+  min-height: 70px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 22px;
+  font-weight: bold;
+}
+.footer {
+  margin-top: 30px;
+  color: #888;
+  font-size: 14px;
+}
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>مترجم صوتي إنجليزي 🔊 → كتابة عربية ✍️</h1>
-    <div class="input-container">
-      <input type="text" id="inputWord" placeholder="أدخل كلمة بالإنجليزية (مثل: go, school)" />
-      
-      <div class="input-controls">
-        <button id="clearInputBtn" title="مسح حقل الإدخال">✕</button>
-        <button id="speakBtn" title="نطق الكلمة">🗣️</button>
-      </div>
-    </div>
-    <button id="translateBtn" class="main-btn">ترجم الكلمة</button>
-    
-    <div class="output-container">
-      <div id="result">النتيجة ستظهر هنا...</div>
-      <div class="loader" id="loader"></div>
-      <button id="copyBtn" class="copy-btn" title="نسخ النتيجة">📋</button>
-    </div>
 
-    <button id="installButton" class="main-btn">تثبيت التطبيق 📲</button>
-  </div>
-  
-  <div class="footer-note">
-    برمجة حسين العرياني 💥
-  </div>
+<h1>🎧 مترجم صوتي إنجليزي → كتابة عربية</h1>
 
-  <script>
-    const synth = window.speechSynthesis;
-    let englishVoice = null;
-    
-    function populateVoiceList() {
-        if(synth.getVoices().length > 0) {
-            englishVoice = synth.getVoices().find(voice => 
-                voice.lang.startsWith('en') && voice.name.includes('Google')
-            ) || synth.getVoices().find(voice => voice.lang.startsWith('en'));
+<input type="text" id="inputWord" placeholder="اكتب كلمة إنجليزية مثل: go, school">
+<button onclick="translatePhonetically()">📝 ترجمة صوتية</button>
+<button onclick="speakWord()">🔊 نطق الكلمة</button>
 
-             if (!englishVoice) {
-                console.warn('⚠️ لم يتم العثور على صوت إنجليزي جيد.');
-             }
-        }
-    }
+<div id="output">النتيجة ستظهر هنا...</div>
 
-    if (synth.onvoiceschanged !== undefined) {
-      synth.onvoiceschanged = populateVoiceList;
-    }
-    populateVoiceList();
+<div class="footer">برمجة: حسين العرياني 💥</div>
 
-    function speakWord(word) {
-        if (!word.trim()) return;
+<script>
+// ✅ قاعدة تحويل الحروف إلى كتابة عربية
+const exceptions = {
+  "go": "قو", "school": "إسكول", "know": "نو",
+  "communication": "كوميونيكيشن", "nation": "نيشن", "station": "ستيشن",
+  "phone": "فون", "write": "رايت", "castle": "كاسل"
+};
 
-        if (synth.speaking) {
-            synth.cancel();
-        }
+const map = [
+  ['tion', 'شن'], ['sion', 'جن'], ['sch', 'إسك'], ['kn', 'ن'], 
+  ['ph', 'ف'], ['gh', 'ف'], ['wr', 'ر'], ['tch', 'تش'], 
+  ['sh', 'ش'], ['ch', 'تش'], ['th', 'ث'], ['ck', 'ك'], ['oo', 'وو'],
+  ['ee', 'ي'], ['ou', 'او'], ['ow', 'و'], ['qu', 'كو'], ['ci', 'سي'],
+  ['ge', 'ج'], ['gi', 'ج'], ['ea', 'ي'], ['ai', 'أي'],
+  ['a', 'ا'], ['b', 'ب'], ['c', 'ك'], ['d', 'د'], ['e', 'ي'],
+  ['f', 'ف'], ['g', 'ج'], ['h', 'ه'], ['i', 'ي'], ['j', 'ج'],
+  ['k', 'ك'], ['l', 'ل'], ['m', 'م'], ['n', 'ن'], ['o', 'و'],
+  ['p', 'ب'], ['q', 'ك'], ['r', 'ر'], ['s', 'س'], ['t', 'ت'],
+  ['u', 'و'], ['v', 'ف'], ['w', 'و'], ['x', 'كس'], ['y', 'ي'],
+  ['z', 'ز']
+];
 
-        const utterance = new SpeechSynthesisUtterance(word.trim());
-        utterance.lang = 'en-US'; 
-        utterance.voice = englishVoice;
-        utterance.pitch = 1;
-        utterance.rate = 1;
+// 🧠 دالة التحويل الصوتي
+function transliterate(word) {
+  let w = word.toLowerCase().trim().replace(/[^a-z]/g, '');
+  let out = '';
+  if (!w) return ""; 
 
-        synth.speak(utterance);
-    }
+  if (exceptions[w]) return exceptions[w];
 
-    // PWA Logic (باقي المنطق)
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js').then(function(registration) {
-          console.log('✅ ServiceWorker مسجل بنجاح');
-        }, function(err) {
-          console.log('❌ فشل تسجيل ServiceWorker:', err);
-        });
-      });
-    }
-
-    let deferredPrompt;
-    const installButton = document.getElementById('installButton');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installButton.style.display = 'block';
-    });
-
-    installButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('✅ المستخدم وافق على التثبيت');
-          } else {
-            console.log('❌ المستخدم رفض التثبيت');
-          }
-          installButton.style.display = 'none';
-          deferredPrompt = null;
-        });
+  while (w.length > 0) {
+    let matched = false;
+    for (const [eng, arb] of map) {
+      if (w.startsWith(eng)) {
+        out += arb;
+        w = w.slice(eng.length);
+        matched = true;
+        break;
       }
-    });
-    
-    // Translation and UX Logic
-    const inputField = document.getElementById("inputWord");
-    const translateBtn = document.getElementById("translateBtn");
-    const resultDiv = document.getElementById("result");
-    const copyBtn = document.getElementById("copyBtn");
-    const clearBtn = document.getElementById("clearInputBtn");
-    const speakBtn = document.getElementById("speakBtn");
-    const loader = document.getElementById("loader");
-    
-    const exceptions = {
-      "go": "قو", "school": "إسكول", "know": "نو",
-      "communication": "كوميونيكيشن", "nation": "نيشن", "station": "ستيشن",
-      "phone": "فون", "write": "رايت", "castle": "كاسل"
-    };
-
-    const map = [
-      ['tion', 'شن'], ['sion', 'جن'], ['sch', 'إسك'], ['kn', 'ن'], 
-      ['ph', 'ف'], ['gh', 'ف'], ['wr', 'ر'], ['tch', 'تش'], 
-      ['sh', 'ش'], ['ch', 'تش'], ['th', 'ث'], ['ck', 'ك'], ['oo', 'وو'],
-      ['ee', 'ي'], ['ou', 'او'], ['ow', 'و'], ['qu', 'كو'], ['ci', 'سي'],
-      ['ge', 'ج'], ['gi', 'ج'], ['ea', 'ي'], ['ai', 'أي'],
-      ['a', 'ا'], ['b', 'ب'], ['c', 'ك'], ['d', 'د'], ['e', 'ي'],
-      ['f', 'ف'], ['g', 'ج'], ['h', 'ه'], ['i', 'ي'], ['j', 'ج'],
-      ['k', 'ك'], ['l', 'ل'], ['m', 'م'], ['n', 'ن'], ['o', 'و'],
-      ['p', 'ب'], ['q', 'ك'], ['r', 'ر'], ['s', 'س'], ['t', 'ت'],
-      ['u', 'و'], ['v', 'ف'], ['w', 'و'], ['x', 'كس'], ['y', 'ي'],
-      ['z', 'ز']
-    ];
-
-    function transliterate(word) {
-        let w = word.toLowerCase().trim().replace(/[^a-z]/g, '');
-        let out = '';
-        if (!w) return ""; 
-
-        while (w.length > 0) {
-            let matched = false;
-            for (const [eng, arb] of map) {
-                if (w.startsWith(eng)) {
-                    out += arb;
-                    w = w.slice(eng.length);
-                    matched = true;
-                    break;
-                }
-            }
-            if (!matched) w = w.slice(1);
-        }
-        return out;
     }
+    if (!matched) w = w.slice(1);
+  }
+  return out;
+}
 
-    translateBtn.addEventListener("click", () => {
-      const input = inputField.value.trim().toLowerCase();
-      
-      if (!input) {
-        resultDiv.textContent = "يرجى إدخال كلمة إنجليزية أولاً. 👆";
-        return;
-      }
+// 🎯 عند الضغط على زر الترجمة
+function translatePhonetically() {
+  const word = document.getElementById('inputWord').value.trim();
+  if (!word) {
+    document.getElementById('output').textContent = "أدخل كلمة أولاً 👆";
+    return;
+  }
+  const result = transliterate(word);
+  document.getElementById('output').textContent = result || "لم أتمكن من تحويل الكلمة.";
+}
 
-      resultDiv.style.display = 'none';
-      loader.style.display = 'block';
-      copyBtn.style.display = 'none';
+// 🔊 النطق الصوتي
+function speakWord() {
+  const word = document.getElementById('inputWord').value.trim();
+  if (!word) return;
 
-      setTimeout(() => {
-        let output = exceptions[input] || transliterate(input);
+  if (typeof Android !== "undefined" && Android.speak) {
+    Android.speak(word);
+  } else if ('speechSynthesis' in window) {
+    const utter = new SpeechSynthesisUtterance(word);
+    utter.lang = 'en-US';
+    utter.pitch = 1;
+    utter.rate = 1;
+    speechSynthesis.speak(utter);
+  } else {
+    alert("النطق غير مدعوم في هذا الجهاز.");
+  }
+}
+</script>
 
-        loader.style.display = 'none';
-        resultDiv.style.display = 'block';
-        
-        if (output) {
-            resultDiv.textContent = output;
-            copyBtn.style.display = 'block';
-        } else {
-            resultDiv.textContent = "لم أتمكن من التحويل بدقة. 🧐";
-            copyBtn.style.display = 'none';
-        }
-
-      }, 500); 
-    });
-
-    clearBtn.addEventListener("click", () => {
-        inputField.value = '';
-        clearBtn.style.display = 'none';
-        speakBtn.style.display = 'none';
-        resultDiv.textContent = "النتيجة ستظهر هنا...";
-        copyBtn.style.display = 'none';
-    });
-    
-    inputField.addEventListener("input", () => {
-        const hasText = inputField.value.length > 0;
-        clearBtn.style.display = hasText ? 'block' : 'none';
-        
-        if (window.speechSynthesis) {
-            speakBtn.style.display = hasText ? 'block' : 'none';
-        }
-        
-    });
-    
-    speakBtn.addEventListener("click", () => {
-        const word = inputField.value.trim();
-        speakWord(word);
-    });
-
-    copyBtn.addEventListener("click", () => {
-        const textToCopy = resultDiv.textContent;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = '✅';
-            setTimeout(() => {
-                copyBtn.textContent = originalText;
-            }, 1000);
-        }).catch(err => {
-            console.error('فشل النسخ:', err);
-        });
-    });
-
-    inputField.addEventListener("keypress", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            translateBtn.click();
-        }
-    });
-
-    window.onload = () => {
-        copyBtn.style.display = 'none';
-        clearBtn.style.display = 'none';
-        speakBtn.style.display = 'none';
-    }
-  </script>
 </body>
 </html>
