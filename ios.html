@@ -3,283 +3,555 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>موقعي - تطبيق</title>
+    <title>منشئ تطبيقات iOS</title>
     <style>
-        /* تنسيق زر العودة للرئيسية */
-        #pwa-home-button {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 10000;
-            display: none;
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --background-color: #F2F2F7;
+            --card-color: #FFFFFF;
+            --text-color: #1C1C1E;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
-        .home-btn {
-            background: #007AFF;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            color: #8E8E93;
+            font-size: 1rem;
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        input, button, select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #C7C7CC;
+            font-size: 16px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        button {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-size: 14px;
             cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            font-weight: bold;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-top: 10px;
         }
         
-        .home-btn:hover {
-            background: #0056CC;
+        button:hover {
+            background-color: #0056CC;
         }
         
-        /* تنسيق النوافذ المنبثقة المخصصة */
-        .pwa-popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 10001;
-            display: none;
+        button.secondary {
+            background-color: #8E8E93;
         }
         
-        .pwa-popup-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            height: 80%;
-            background: white;
-            border-radius: 15px;
-            z-index: 10002;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        button.secondary:hover {
+            background-color: #6D6D72;
         }
         
-        .pwa-popup-header {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+        .icon-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background-color: #E5E5EA;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            margin: 15px auto;
+            overflow: hidden;
         }
         
-        .pwa-popup-close {
-            background: #FF3B30;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 15px;
+        .icon-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .icon-preview span {
+            color: #8E8E93;
+            font-size: 12px;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
             cursor: pointer;
         }
         
-        .pwa-popup-content {
-            width: 100%;
-            height: calc(100% - 60px);
+        .file-input-button {
+            background-color: #E5E5EA;
+            color: var(--text-color);
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
         }
         
-        .pwa-popup-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 0 0 15px 15px;
+        .result-section {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .success-icon {
+            font-size: 60px;
+            color: #34C759;
+            margin-bottom: 20px;
+        }
+        
+        .instructions {
+            background-color: #E5F4FF;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        .instructions ol {
+            padding-right: 20px;
+            margin-top: 10px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .back-button {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #8E8E93;
+            font-size: 14px;
+        }
+
+        .feature-option {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #E5E5EA;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .feature-option.selected {
+            border-color: var(--primary-color);
+            background-color: #E5F4FF;
         }
     </style>
 </head>
 <body>
-    <!-- محتوى موقعك الأصلي هنا -->
-    <h1>مرحباً بك في موقعي</h1>
-    <p>هذا هو المحتوى الرئيسي لموقعك...</p>
+    <header>
+        <h1>منشئ تطبيقات iOS</h1>
+        <p class="subtitle">حول أي موقع ويب إلى تطبيق على جهاز الأيفون الخاص بك</p>
+    </header>
     
-    <!-- زر العودة للرئيسية -->
-    <div id="pwa-home-button">
-        <button class="home-btn" onclick="goToHomePage()">🏠 الرئيسية</button>
-    </div>
+    <main>
+        <section id="form-section" class="card">
+            <form id="webapp-form">
+                <div class="form-group">
+                    <label for="site-name">اسم التطبيق</label>
+                    <input type="text" id="site-name" placeholder="أدخل اسم التطبيق" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="site-url">رابط الموقع</label>
+                    <input type="url" id="site-url" placeholder="https://example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>أيقونة التطبيق</label>
+                    <div class="icon-preview" id="icon-preview">
+                        <span>معاينة الأيقونة</span>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <div class="file-input-button">اختر صورة من الجهاز</div>
+                        <input type="file" id="icon-file" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ميزات إضافية</label>
+                    <div class="feature-option" onclick="toggleFeature(this)">
+                        <input type="checkbox" id="home-button-feature" style="display: none;">
+                        <strong>زر العودة للرئيسية</strong>
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">إضافة زر للعودة للصفحة الرئيسية في التطبيق</p>
+                    </div>
+                    <div class="feature-option" onclick="toggleFeature(this)">
+                        <input type="checkbox" id="popup-handler" style="display: none;" checked>
+                        <strong>معالجة النوافذ المنبثقة</strong>
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">تحويل النوافذ المنبثقة إلى نوافذ داخل التطبيق</p>
+                    </div>
+                </div>
+                
+                <button type="submit" id="generate-btn">إنشاء ملف التثبيت</button>
+            </form>
+        </section>
+        
+        <section id="result-section" class="card result-section">
+            <div class="success-icon">✓</div>
+            <h2>تم إنشاء ملف التثبيت بنجاح!</h2>
+            <p>الآن يمكنك تثبيت التطبيق على جهازك</p>
+            
+            <div class="instructions">
+                <p><strong>خطوات التثبيت:</strong></p>
+                <ol>
+                    <li>انقر على زر "تحميل ملف التثبيت" أدناه</li>
+                    <li>افتح الملف المحمل على جهاز الأيفون</li>
+                    <li>انتقل إلى الإعدادات &gt; عام &gt; إدارة الجهاز/الملفات الشخصية</li>
+                    <li>انقر على الملف الشخصي الذي تم تحميله</li>
+                    <li>انقر على "تثبيت" في الزاوية العلوية اليمنى</li>
+                    <li>قد تحتاج إلى إعادة تشغيل الجهاز</li>
+                    <li>ستظهر أيقونة التطبيق على الشاشة الرئيسية</li>
+                </ol>
+            </div>
+            
+            <button id="download-btn">تحميل ملف التثبيت</button>
+            <button id="back-btn" class="secondary back-button">العودة للصفحة الرئيسية</button>
+        </section>
+    </main>
     
-    <!-- النافذة المنبثقة المخصصة -->
-    <div class="pwa-popup-overlay" id="pwaPopupOverlay"></div>
-    <div class="pwa-popup-container" id="pwaPopupContainer">
-        <div class="pwa-popup-header">
-            <button class="home-btn" onclick="goToHomePage()">🏠 الرئيسية</button>
-            <button class="pwa-popup-close" onclick="closePwaPopup()">✕ إغلاق</button>
-        </div>
-        <div class="pwa-popup-content">
-            <iframe class="pwa-popup-iframe" id="pwaPopupIframe"></iframe>
-        </div>
-    </div>
+    <footer>
+        <p>برمجة حسين العرياني</p>
+    </footer>
 
     <script>
-        // اكتشاف إذا كان التطبيق يعمل في وضع PWA
-        function isRunningAsPWA() {
-            return window.navigator.standalone || 
-                   window.matchMedia('(display-mode: standalone)').matches;
-        }
-        
-        // إظهار زر العودة إذا كان PWA
-        function checkPWAStatus() {
-            if (isRunningAsPWA()) {
-                document.getElementById('pwa-home-button').style.display = 'block';
-                console.log('يعمل كتطبيق PWA - تم تفعيل زر العودة');
-            }
-        }
-        
-        // العودة للصفحة الرئيسية
-        function goToHomePage() {
-            const currentUrl = window.location.href;
-            const baseUrl = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-            
-            // إذا لم نكن في الصفحة الرئيسية، ارجع لها
-            if (window.location.pathname !== '/' && !window.location.pathname.endsWith('index.html')) {
-                window.location.href = baseUrl;
-            } else {
-                // إذا كنا في الصفحة الرئيسية، قم بإعادة التحميل
-                window.location.reload();
-            }
-        }
-        
-        // فتح النافذة المنبثقة المخصصة
-        function openPwaPopup(url) {
-            document.getElementById('pwaPopupOverlay').style.display = 'block';
-            document.getElementById('pwaPopupContainer').style.display = 'block';
-            document.getElementById('pwaPopupIframe').src = url;
-        }
-        
-        // إغلاق النافذة المنبثقة
-        function closePwaPopup() {
-            document.getElementById('pwaPopupOverlay').style.display = 'none';
-            document.getElementById('pwaPopupContainer').style.display = 'none';
-            document.getElementById('pwaPopupIframe').src = '';
-        }
-        
-        // إغلاق النافذة بالضغط على الخلفية
-        document.getElementById('pwaPopupOverlay').addEventListener('click', closePwaPopup);
-        
-        // منع إغلاق النافذة عند الضغط على المحتوى
-        document.getElementById('pwaPopupContainer').addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-        
-        // تجاوز window.open الأصلي
-        const originalWindowOpen = window.open;
-        window.open = function(url, name, specs) {
-            if (isRunningAsPWA()) {
-                // في وضع PWA، افتح في النافذة المنبثقة المخصصة
-                openPwaPopup(url);
-                return {
-                    close: function() {
-                        closePwaPopup();
-                    },
-                    closed: false
-                };
-            } else {
-                // في المتصفح العادي، استخدم السلوك الطبيعي
-                return originalWindowOpen.call(window, url, name, specs);
-            }
-        };
-        
-        // تجاوز window.alert
-        const originalAlert = window.alert;
-        window.alert = function(message) {
-            if (isRunningAsPWA()) {
-                // في PWA، استخدم alert مخصص أو console.log
-                console.log('Alert:', message);
-                // يمكنك استبدال هذا بـ modal مخصص إذا أردت
-                if (confirm('تطبيق: ' + message + '\n\nهل تريد العودة للرئيسية؟')) {
-                    goToHomePage();
-                }
-            } else {
-                originalAlert.call(window, message);
-            }
-        };
-        
-        // تجاوز window.confirm
-        const originalConfirm = window.confirm;
-        window.confirm = function(message) {
-            if (isRunningAsPWA()) {
-                console.log('Confirm:', message);
-                // في بيئة حقيقية، استخدم modal مخصص
-                return true; // أو false حسب الحاجة
-            } else {
-                return originalConfirm.call(window, message);
-            }
-        };
-        
-        // التعامل مع الروابط التي تفتح في نافذة جديدة
         document.addEventListener('DOMContentLoaded', function() {
-            const links = document.querySelectorAll('a[target="_blank"]');
-            links.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    if (isRunningAsPWA()) {
-                        e.preventDefault();
-                        openPwaPopup(this.href);
+            const form = document.getElementById('webapp-form');
+            const siteNameInput = document.getElementById('site-name');
+            const siteUrlInput = document.getElementById('site-url');
+            const iconFileInput = document.getElementById('icon-file');
+            const iconPreview = document.getElementById('icon-preview');
+            const generateBtn = document.getElementById('generate-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const backBtn = document.getElementById('back-btn');
+            const formSection = document.getElementById('form-section');
+            const resultSection = document.getElementById('result-section');
+            
+            let iconData = null;
+            
+            // معالجة اختيار صورة الأيقونة
+            iconFileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        iconData = e.target.result;
+                        iconPreview.innerHTML = `<img src="${iconData}" alt="معاينة الأيقونة">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // معالجة تقديم النموذج
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const siteName = siteNameInput.value;
+                const siteUrl = siteUrlInput.value;
+                const includeHomeButton = document.getElementById('home-button-feature').checked;
+                const includePopupHandler = document.getElementById('popup-handler').checked;
+                
+                if (!siteName || !siteUrl) {
+                    alert('يرجى ملء جميع الحقول المطلوبة');
+                    return;
+                }
+                
+                // إنشاء ملف التثبيت
+                createInstallationProfile(siteName, siteUrl, iconData, includeHomeButton, includePopupHandler);
+                
+                // إظهار قسم النتيجة وإخفاء قسم النموذج
+                formSection.style.display = 'none';
+                resultSection.style.display = 'block';
+                backBtn.style.display = 'block';
+            });
+            
+            // معالجة زر العودة
+            backBtn.addEventListener('click', function() {
+                formSection.style.display = 'block';
+                resultSection.style.display = 'none';
+                backBtn.style.display = 'none';
+                
+                // إعادة تعيين النموذج
+                form.reset();
+                iconPreview.innerHTML = '<span>معاينة الأيقونة</span>';
+                iconData = null;
+            });
+            
+            // إنشاء ملف تعريف التثبيت
+            function createInstallationProfile(name, url, icon, homeButton, popupHandler) {
+                // توليد معرفات فريدة
+                const uuid1 = generateUUID();
+                const uuid2 = generateUUID();
+                const uuid3 = generateUUID();
+                
+                // تحويل الصورة إلى تنسيق base64 إذا كانت موجودة
+                let iconBase64 = '';
+                if (icon) {
+                    // إزالة بادئة البيانات إذا كانت موجودة
+                    const base64Data = icon.split(',')[1];
+                    iconBase64 = base64Data;
+                }
+                
+                // إنشاء محتوى ملف الـ plist
+                const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>FullScreen</key>
+            <true/>
+            <key>IgnoreManifestScope</key>
+            <true/>
+            <key>Icon</key>
+            <data>${iconBase64}</data>
+            <key>IsRemovable</key>
+            <true/>
+            <key>Label</key>
+            <string>${name}</string>
+            <key>PayloadDescription</key>
+            <string>الموقع</string>
+            <key>PayloadDisplayName</key>
+            <string>${name}</string>
+            <key>PayloadIdentifier</key>
+            <string>${uuid1}</string>
+            <key>PayloadOrganization</key>
+            <string>Me</string>
+            <key>PayloadType</key>
+            <string>com.apple.webClip.managed</string>
+            <key>PayloadUUID</key>
+            <string>${uuid2}</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>Precomposed</key>
+            <true/>
+            <key>URL</key>
+            <string>${url}</string>
+        </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>برمجة حسين العرياني</string>
+    <key>PayloadDisplayName</key>
+    <string>${name}</string>
+    <key>PayloadIdentifier</key>
+    <string>appicon.${name}</string>
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>${uuid3}</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>`;
+                
+                // إعداد زر التحميل
+                downloadBtn.onclick = function() {
+                    const blob = new Blob([plistContent], { type: 'application/x-apple-aspen-config' });
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = `${name}.mobileconfig`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(downloadUrl);
+                    
+                    // إذا تم اختيار الميزات الإضافية، عرض كود JavaScript
+                    if (homeButton || popupHandler) {
+                        setTimeout(function() {
+                            showJavaScriptCode(name, url, homeButton, popupHandler);
+                        }, 1000);
                     }
+                };
+            }
+            
+            // عرض كود JavaScript للميزات الإضافية
+            function showJavaScriptCode(name, url, homeButton, popupHandler) {
+                let jsCode = '';
+                
+                if (homeButton && popupHandler) {
+                    jsCode = `
+<!-- ضع هذا الكود في موقعك قبل </body> -->
+<script>
+// زر العودة ومعالجة النوافذ المنبثقة
+if (window.navigator.standalone) {
+    // إضافة زر العودة
+    const homeBtn = document.createElement('button');
+    homeBtn.innerHTML = '🏠 الرئيسية';
+    homeBtn.style.cssText = 'position:fixed; top:15px; left:15px; z-index:9999; background:#007AFF; color:white; border:none; padding:10px 15px; border-radius:20px; font-size:14px; cursor:pointer;';
+    homeBtn.onclick = () => window.location.href = '/';
+    document.body.appendChild(homeBtn);
+    
+    // معالجة النوافذ المنبثقة
+    window.open = function(url) {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000;';
+        
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.style.cssText = 'position:fixed; top:50px; left:20px; width:calc(100% - 40px); height:calc(100% - 100px); background:white; border-radius:15px;';
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '✕ إغلاق';
+        closeBtn.style.cssText = 'position:fixed; top:60px; right:30px; z-index:10001; background:#FF3B30; color:white; border:none; padding:8px 12px; border-radius:15px;';
+        closeBtn.onclick = () => {
+            document.body.removeChild(overlay);
+            document.body.removeChild(closeBtn);
+        };
+        
+        overlay.onclick = closeBtn.onclick;
+        overlay.appendChild(iframe);
+        document.body.appendChild(overlay);
+        document.body.appendChild(closeBtn);
+        
+        return {
+            close: () => closeBtn.onclick(),
+            closed: false
+        };
+    };
+}
+<\/script>`;
+                } else if (homeButton) {
+                    jsCode = `
+<!-- ضع هذا الكود في موقعك قبل </body> -->
+<script>
+// زر العودة للرئيسية
+if (window.navigator.standalone) {
+    const homeBtn = document.createElement('button');
+    homeBtn.innerHTML = '🏠 الرئيسية';
+    homeBtn.style.cssText = 'position:fixed; top:15px; left:15px; z-index:9999; background:#007AFF; color:white; border:none; padding:10px 15px; border-radius:20px; font-size:14px; cursor:pointer;';
+    homeBtn.onclick = () => window.location.href = '/';
+    document.body.appendChild(homeBtn);
+}
+<\/script>`;
+                } else if (popupHandler) {
+                    jsCode = `
+<!-- ضع هذا الكود في موقعك قبل </body> -->
+<script>
+// معالجة النوافذ المنبثقة
+if (window.navigator.standalone) {
+    window.open = function(url) {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000;';
+        
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.style.cssText = 'position:fixed; top:50px; left:20px; width:calc(100% - 40px); height:calc(100% - 100px); background:white; border-radius:15px;';
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '✕ إغلاق';
+        closeBtn.style.cssText = 'position:fixed; top:60px; right:30px; z-index:10001; background:#FF3B30; color:white; border:none; padding:8px 12px; border-radius:15px;';
+        closeBtn.onclick = () => {
+            document.body.removeChild(overlay);
+            document.body.removeChild(closeBtn);
+        };
+        
+        overlay.onclick = closeBtn.onclick;
+        overlay.appendChild(iframe);
+        document.body.appendChild(overlay);
+        document.body.appendChild(closeBtn);
+        
+        return {
+            close: () => closeBtn.onclick(),
+            closed: false
+        };
+    };
+}
+<\/script>`;
+                }
+                
+                if (jsCode) {
+                    alert('لتفعيل الميزات الإضافية، يرجى وضع كود JavaScript التالي في موقعك قبل علامة \\</body>:\n\n' + jsCode);
+                }
+            }
+            
+            // دالة لتوليد UUID
+            function generateUUID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
                 });
-            });
-            
-            // إضافة زر العودة تلقائياً للنماذج
-            const forms = document.querySelectorAll('form');
-            forms.forEach(form => {
-                if (!form.querySelector('.home-btn')) {
-                    const homeBtn = document.createElement('button');
-                    homeBtn.type = 'button';
-                    homeBtn.className = 'home-btn';
-                    homeBtn.textContent = '🏠 الرئيسية';
-                    homeBtn.onclick = goToHomePage;
-                    homeBtn.style.margin = '10px';
-                    form.appendChild(homeBtn);
-                }
-            });
-        });
-        
-        // التعامل مع زر الرجوع في المتصفح
-        window.addEventListener('popstate', function() {
-            if (isRunningAsPWA()) {
-                // في PWA، استخدم زر العودة المخصص
-                goToHomePage();
             }
-        });
-        
-        // إضافة زر العودة للصفحات الديناميكية
-        function addHomeButtonToNewContent() {
-            if (isRunningAsPWA()) {
-                const existingButton = document.querySelector('#pwa-home-button');
-                if (!existingButton) {
-                    const homeButton = document.createElement('div');
-                    homeButton.id = 'pwa-home-button';
-                    homeButton.innerHTML = '<button class="home-btn" onclick="goToHomePage()">🏠 الرئيسية</button>';
-                    document.body.appendChild(homeButton);
-                }
-            }
-        }
-        
-        // مراقبة التغييرات في DOM لإضافة زر العودة
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.addedNodes.length) {
-                    addHomeButtonToNewContent();
-                }
-            });
-        });
-        
-        // بدء المراقبة عند تحميل الصفحة
-        window.addEventListener('load', function() {
-            checkPWAStatus();
-            addHomeButtonToNewContent();
             
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
+            // تفعيل/إلغاء تفعيل الميزات
+            window.toggleFeature = function(element) {
+                const checkbox = element.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                element.classList.toggle('selected', checkbox.checked);
+            };
         });
-        
-        // للصفحات التي يتم تحميلها عبر AJAX
-        if (typeof jQuery !== 'undefined') {
-            $(document).ajaxComplete(function() {
-                setTimeout(addHomeButtonToNewContent, 100);
-            });
-        }
     </script>
 </body>
 </html>
