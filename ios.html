@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تثبيت موقع كتطبيق على iPhone</title>
+<style>
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: #f2f4f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 15px;
+    color: #1f5fa6;
+  }
+  input[type="text"], input[type="url"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: left;
+  }
+  input[type="file"] {
+    margin: 10px 0;
+  }
+  button {
+    width: 100%;
+    background: #1f5fa6;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #174b83;
+  }
+  footer {
+    margin-top: 15px;
+    color: #777;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h2>📱 تثبيت موقع كتطبيق iPhone</h2>
+    <input type="text" id="name" placeholder="اسم الموقع" required>
+    <input type="url" id="url" placeholder="رابط الموقع https://" required>
+    <input type="file" id="icon" accept="image/*">
+    <button onclick="generateConfig()">📥 إنشاء ملف التثبيت</button>
+    <footer>برمجة حسين العرياني 💥</footer>
+  </div>
+
+  <script>
+    async function generateConfig() {
+      const name = document.getElementById('name').value.trim();
+      const url = document.getElementById('url').value.trim();
+      const iconFile = document.getElementById('icon').files[0];
+
+      if (!name || !url) {
+        alert("⚠️ الرجاء إدخال اسم الموقع والرابط.");
+        return;
+      }
+
+      let iconData = "";
+      if (iconFile) {
+        const reader = new FileReader();
+        iconData = await new Promise((resolve) => {
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.readAsDataURL(iconFile);
+        });
+      }
+
+      const uuid = crypto.randomUUID();
+      const plist = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>PayloadContent</key>
+  <array>
+    <dict>
+      <key>FullScreen</key><true/>
+      <key>IgnoreManifestScope</key><true/>
+      <key>Icon</key><data>${iconData}</data>
+      <key>IsRemovable</key><true/>
+      <key>Label</key><string>${name}</string>
+      <key>PayloadDescription</key><string>${name}</string>
+      <key>PayloadDisplayName</key><string>${name}</string>
+      <key>PayloadIdentifier</key><string>com.hussain.${uuid}</string>
+      <key>PayloadOrganization</key><string>برمجة حسين العرياني</string>
+      <key>PayloadType</key><string>com.apple.webClip.managed</string>
+      <key>PayloadUUID</key><string>${uuid}</string>
+      <key>PayloadVersion</key><integer>1</integer>
+      <key>Precomposed</key><true/>
+      <key>URL</key><string>${url}</string>
+    </dict>
+  </array>
+  <key>PayloadDescription</key><string>برمجة حسين العرياني</string>
+  <key>PayloadDisplayName</key><string>${name}</string>
+  <key>PayloadIdentifier</key><string>appicon.${uuid}</string>
+  <key>PayloadRemovalDisallowed</key><false/>
+  <key>PayloadType</key><string>Configuration</string>
+  <key>PayloadUUID</key><string>${uuid}</string>
+  <key>PayloadVersion</key><integer>1</integer>
+</dict>
+</plist>`;
+
+      const blob = new Blob([plist], { type: "application/x-apple-aspen-config" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${name}.mobileconfig`;
+      link.click();
+    }
+  </script>
+</body>
+</html>
