@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تثبيت موقع كتطبيق iPhone - نسخة ثابتة</title>
+<title>تثبيت موقع كتطبيق iPhone - نسخة تحكم محسّنة</title>
 <style>
   body {
     font-family: 'Cairo', sans-serif;
@@ -22,19 +22,35 @@
     max-width: 420px;
     text-align: center;
   }
-  h2 { color: #1f5fa6; }
+  h2 {
+    color: #1f5fa6;
+    margin-bottom: 10px;
+  }
   input[type="text"], input[type="url"] {
-    width: 100%; padding: 10px; margin: 8px 0;
-    border: 1px solid #ddd; border-radius: 8px; text-align: left;
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: left;
   }
   input[type="file"] { margin: 10px 0; }
   button {
-    width: 100%; background: #1f5fa6; color: #fff;
-    padding: 12px; border: none; border-radius: 8px;
-    font-size: 16px; cursor: pointer;
+    width: 100%;
+    background: #1f5fa6;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
   }
   button:hover { background: #174b83; }
-  footer { margin-top: 15px; color: #777; font-size: 13px; }
+  footer {
+    margin-top: 15px;
+    color: #777;
+    font-size: 13px;
+  }
 </style>
 </head>
 <body>
@@ -53,7 +69,10 @@
       const url = document.getElementById('url').value.trim();
       const iconFile = document.getElementById('icon').files[0];
 
-      if (!name || !url) return alert("⚠️ أدخل الاسم والرابط أولاً.");
+      if (!name || !url) {
+        alert("⚠️ الرجاء إدخال اسم الموقع والرابط.");
+        return;
+      }
 
       let iconData = "";
       if (iconFile) {
@@ -64,8 +83,8 @@
         });
       }
 
-      // توليد صفحة التحكم محليًا
-      const controlPage = `
+      // ✅ صفحة التحكم HTML حقيقية وليست كود نصي
+      const controlHTML = `
 <!DOCTYPE html>
 <html lang='ar' dir='rtl'>
 <head>
@@ -73,7 +92,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 <title>${name}</title>
 <style>
-  body,html{margin:0;padding:0;height:100%;overflow:hidden;}
+  body,html{margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;}
   .bar{position:fixed;top:0;left:0;width:100%;height:45px;
     background:#1f5fa6;display:flex;align-items:center;
     justify-content:space-around;color:#fff;z-index:999;}
@@ -96,14 +115,15 @@
 </body>
 </html>`;
 
-      // حفظها كملف HTML
-      const htmlBlob = new Blob([controlPage], {type: "text/html"});
+      // ✅ إنشاء ملف HTML فعلي
+      const htmlBlob = new Blob([controlHTML], {type: "text/html;charset=utf-8"});
+      const htmlURL = URL.createObjectURL(htmlBlob);
       const htmlLink = document.createElement("a");
-      htmlLink.href = URL.createObjectURL(htmlBlob);
+      htmlLink.href = htmlURL;
       htmlLink.download = "control.html";
       htmlLink.click();
 
-      // إعداد ملف التثبيت
+      // ✅ توليد ملف التثبيت .mobileconfig
       const uuid = crypto.randomUUID();
       const plist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -134,7 +154,7 @@
 </dict>
 </plist>`;
 
-      const configBlob = new Blob([plist], { type: "application/x-apple-aspen-config" });
+      const configBlob = new Blob([plist], { type: "application/x-apple-aspen-config;charset=utf-8" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(configBlob);
       link.download = `${name}.mobileconfig`;
