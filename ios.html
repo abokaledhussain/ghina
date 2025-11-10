@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تثبيت موقع كتطبيق iPhone - نسخة تحكم</title>
+<title>تثبيت موقع كتطبيق iPhone - نسخة ثابتة</title>
 <style>
   body {
     font-family: 'Cairo', sans-serif;
@@ -22,35 +22,19 @@
     max-width: 420px;
     text-align: center;
   }
-  h2 {
-    margin-bottom: 15px;
-    color: #1f5fa6;
-  }
+  h2 { color: #1f5fa6; }
   input[type="text"], input[type="url"] {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    text-align: left;
+    width: 100%; padding: 10px; margin: 8px 0;
+    border: 1px solid #ddd; border-radius: 8px; text-align: left;
   }
   input[type="file"] { margin: 10px 0; }
   button {
-    width: 100%;
-    background: #1f5fa6;
-    color: #fff;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
+    width: 100%; background: #1f5fa6; color: #fff;
+    padding: 12px; border: none; border-radius: 8px;
+    font-size: 16px; cursor: pointer;
   }
   button:hover { background: #174b83; }
-  footer {
-    margin-top: 15px;
-    color: #777;
-    font-size: 13px;
-  }
+  footer { margin-top: 15px; color: #777; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -59,31 +43,28 @@
     <input type="text" id="name" placeholder="اسم الموقع" required>
     <input type="url" id="url" placeholder="رابط الموقع https://" required>
     <input type="file" id="icon" accept="image/*">
-    <button onclick="generateConfig()">📥 إنشاء ملف التثبيت</button>
+    <button onclick="generate()">📥 إنشاء ملف التثبيت</button>
     <footer>برمجة حسين العرياني 💥</footer>
   </div>
 
   <script>
-    async function generateConfig() {
+    async function generate() {
       const name = document.getElementById('name').value.trim();
       const url = document.getElementById('url').value.trim();
       const iconFile = document.getElementById('icon').files[0];
 
-      if (!name || !url) {
-        alert("⚠️ الرجاء إدخال اسم الموقع والرابط.");
-        return;
-      }
+      if (!name || !url) return alert("⚠️ أدخل الاسم والرابط أولاً.");
 
       let iconData = "";
       if (iconFile) {
         const reader = new FileReader();
-        iconData = await new Promise((resolve) => {
-          reader.onload = () => resolve(reader.result.split(",")[1]);
+        iconData = await new Promise(res=>{
+          reader.onload = ()=>res(reader.result.split(",")[1]);
           reader.readAsDataURL(iconFile);
         });
       }
 
-      // واجهة التحكم HTML محفوظة داخل التطبيق
+      // توليد صفحة التحكم محليًا
       const controlPage = `
 <!DOCTYPE html>
 <html lang='ar' dir='rtl'>
@@ -92,32 +73,37 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 <title>${name}</title>
 <style>
-  body,html {margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;}
-  iframe {width:100%;height:100%;border:none;}
-  .bar {
-    position:fixed;top:0;left:0;width:100%;height:45px;
+  body,html{margin:0;padding:0;height:100%;overflow:hidden;}
+  .bar{position:fixed;top:0;left:0;width:100%;height:45px;
     background:#1f5fa6;display:flex;align-items:center;
-    justify-content:space-around;color:white;z-index:999;
-  }
-  .bar button {
-    background:none;border:none;color:white;font-size:20px;cursor:pointer;
-  }
+    justify-content:space-around;color:#fff;z-index:999;}
+  .bar button{background:none;border:none;color:white;font-size:20px;cursor:pointer;}
+  iframe{width:100%;height:100%;border:none;margin-top:45px;}
 </style>
 </head>
 <body>
 <div class='bar'>
   <button onclick='history.back()'>⬅️</button>
-  <button onclick='window.location.href="${url}"'>🏠</button>
-  <button onclick='document.getElementById("site").contentWindow.location.reload()'>🔄</button>
+  <button onclick='document.getElementById("f").src=localStorage.getItem("main")'>🏠</button>
+  <button onclick='document.getElementById("f").contentWindow.location.reload()'>🔄</button>
 </div>
-<iframe id='site' src='${url}' style='margin-top:45px;'></iframe>
+<iframe id='f'></iframe>
+<script>
+  const main = new URLSearchParams(location.search).get("url");
+  localStorage.setItem("main", main);
+  document.getElementById("f").src = main;
+</script>
 </body>
 </html>`;
 
-      // حوّل واجهة التحكم إلى Base64
-      const controlBase64 = btoa(unescape(encodeURIComponent(controlPage)));
-      const dataUrl = "data:text/html;base64," + controlBase64;
+      // حفظها كملف HTML
+      const htmlBlob = new Blob([controlPage], {type: "text/html"});
+      const htmlLink = document.createElement("a");
+      htmlLink.href = URL.createObjectURL(htmlBlob);
+      htmlLink.download = "control.html";
+      htmlLink.click();
 
+      // إعداد ملف التثبيت
       const uuid = crypto.randomUUID();
       const plist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -127,37 +113,33 @@
   <array>
     <dict>
       <key>FullScreen</key><true/>
-      <key>IgnoreManifestScope</key><true/>
       <key>Icon</key><data>${iconData}</data>
       <key>IsRemovable</key><true/>
       <key>Label</key><string>${name}</string>
-      <key>PayloadDescription</key><string>${name}</string>
       <key>PayloadDisplayName</key><string>${name}</string>
       <key>PayloadIdentifier</key><string>com.hussain.${uuid}</string>
       <key>PayloadOrganization</key><string>برمجة حسين العرياني</string>
-      <key>PayloadType</key><string>com.apple.webClip.managed</key>
+      <key>PayloadType</key><string>com.apple.webClip.managed</string>
       <key>PayloadUUID</key><string>${uuid}</string>
       <key>PayloadVersion</key><integer>1</integer>
       <key>Precomposed</key><true/>
-      <key>URL</key><string>${dataUrl}</string>
+      <key>URL</key><string>control.html?url=${encodeURIComponent(url)}</string>
     </dict>
   </array>
-  <key>PayloadDescription</key><string>برمجة حسين العرياني</string>
   <key>PayloadDisplayName</key><string>${name}</string>
   <key>PayloadIdentifier</key><string>appicon.${uuid}</string>
-  <key>PayloadRemovalDisallowed</key><false/>
-  <key>PayloadType</key><string>Configuration</key>
+  <key>PayloadType</key><string>Configuration</string>
   <key>PayloadUUID</key><string>${uuid}</string>
   <key>PayloadVersion</key><integer>1</integer>
 </dict>
 </plist>`;
 
-      const blob = new Blob([plist], { type: "application/x-apple-aspen-config" });
+      const configBlob = new Blob([plist], { type: "application/x-apple-aspen-config" });
       const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
+      link.href = URL.createObjectURL(configBlob);
       link.download = `${name}.mobileconfig`;
       link.click();
     }
   </script>
 </body>
-</html>
+      </html>
